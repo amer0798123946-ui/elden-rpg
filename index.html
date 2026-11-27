@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#07060a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Elden RPG">
+<title>Elden RPG - Legendary Edition</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cinzel+Decorative:wght@700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --gold:#c8a45c; --gold-glow:#f1d899; --gold-deep:#7a5a1e;
+  --blood:#8f1818; --blood-glow:#d9402f;
+  --green:#4f9a62; --blue:#2f7fc4; --orange:#e0993e; --purple:#8a63d2; --purple-soft:#d9cbf6;
+  --text-main:#d8cdb6; --text-dim:#8d836f;
+  --border-color:rgba(200,164,92,.35);
+  --panel:linear-gradient(180deg,rgba(28,22,15,.92),rgba(11,9,8,.95));
+  --frame:inset 0 0 0 3px #090807, inset 0 0 0 4px rgba(200,164,92,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{scrollbar-color:#4a3a1c #0a0806}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#0a0806}
+::-webkit-scrollbar-thumb{background:#4a3a1c;border:2px solid #0a0806;border-radius:6px}
+::selection{background:rgba(200,164,92,.35);color:#fff}
+
+body{
+  background:#07060a; color:var(--text-main); font-family:'Amiri',serif; font-size:17px;
+  padding:78px 0 112px; min-height:100vh; overflow-x:hidden; user-select:none;
+}
+h2,h3{font-family:'Cinzel','Amiri',serif;color:var(--gold);font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold-glow);outline-offset:2px}
+
+/* ---------- الأجواء ---------- */
+.atmos{position:fixed;inset:0;z-index:-3;pointer-events:none;
+  background:
+    radial-gradient(ellipse 62% 46% at 50% -6%,rgba(241,216,153,.24),transparent 70%),
+    radial-gradient(ellipse 90% 60% at 50% 112%,rgba(122,90,30,.2),transparent 70%),
+    linear-gradient(180deg,#0e0a07 0%,#07060a 55%,#0a0806 100%)}
+.atmos::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.8) 100%)}
+.fog{position:fixed;left:-20%;right:-20%;bottom:0;height:42vh;z-index:-2;pointer-events:none;
+  background:radial-gradient(ellipse at 28% 100%,rgba(200,164,92,.09),transparent 60%),radial-gradient(ellipse at 76% 100%,rgba(140,150,175,.08),transparent 60%);
+  animation:drift 30s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translateX(-4%)}to{transform:translateX(4%)}}
+#embers{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+/* ---------- الشريط العلوي ---------- */
+.top-bar{position:fixed;top:0;left:0;width:100%;z-index:200;display:flex;justify-content:center;gap:10px;padding:12px;
+  background:linear-gradient(to bottom,rgba(0,0,0,.92),transparent);pointer-events:none}
+.top-btn{pointer-events:auto;background:rgba(12,10,8,.92);border:1px solid var(--gold);color:var(--gold);padding:9px 24px;border-radius:2px;
+  cursor:pointer;font-family:'Cinzel','Amiri',serif;font-size:16px;transition:.3s;box-shadow:var(--frame),0 0 14px rgba(0,0,0,.8)}
+.top-btn:hover:not(:disabled){background:var(--gold);color:#120d05;box-shadow:0 0 20px rgba(200,164,92,.6)}
+.top-btn.on{background:var(--gold);color:#120d05}
+.top-btn.undo{border-color:var(--orange);color:var(--orange)}
+.top-btn.undo:hover:not(:disabled){background:var(--orange);color:#120d05;box-shadow:0 0 20px rgba(224,153,62,.6)}
+.top-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ---------- التنقل ---------- */
+.nav-bar{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;padding:14px 0 16px;z-index:100;
+  background:linear-gradient(to top,#030302,rgba(14,11,8,.96));border-top:1px solid rgba(200,164,92,.55);box-shadow:0 -8px 30px rgba(0,0,0,.85)}
+.nav-btn{background:none;border:none;color:#7c725f;font-size:19px;font-family:'Cinzel','Amiri',serif;cursor:pointer;transition:.3s;padding:0 8px}
+.nav-btn::before{content:"";display:block;width:7px;height:7px;margin:0 auto 7px;background:transparent;transform:rotate(45deg);transition:.3s}
+.nav-btn:hover{color:var(--gold-glow)}
+.nav-btn.active{color:var(--gold-glow);text-shadow:0 0 14px rgba(241,216,153,.6)}
+.nav-btn.active::before{background:var(--gold);box-shadow:0 0 10px var(--gold-glow)}
+
+.page{padding:30px;max-width:1100px;margin:auto;display:none}
+.page.active{display:block;animation:fadeIn .5s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- الشعار ---------- */
+.hero{text-align:center;margin:0 auto 38px}
+.erdtree{width:min(430px,86%);height:auto;display:block;margin:0 auto -20px;overflow:visible;filter:drop-shadow(0 0 20px rgba(241,216,153,.35))}
+.hero-title{font-family:'Cinzel Decorative','Cinzel',serif;font-weight:900;font-size:clamp(34px,8vw,66px);letter-spacing:.16em;line-height:1.1;
+  background:linear-gradient(180deg,#fff4d4 0%,#e3c27a 45%,#8a6a2a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 18px rgba(241,216,153,.35));padding-left:.16em}
+.hero-sub{font-family:'Cinzel',serif;letter-spacing:.55em;font-size:13px;color:var(--gold);margin-top:10px;padding-left:.55em}
+.ornament{position:relative;height:16px;margin:20px auto 0;width:min(380px,72%)}
+.ornament::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:linear-gradient(90deg,transparent,var(--gold) 28%,var(--gold) 72%,transparent)}
+.ornament::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;transform:translate(-50%,-50%) rotate(45deg);background:#0a0806;border:1px solid var(--gold);box-shadow:0 0 10px rgba(241,216,153,.6)}
+
+/* ---------- اللوحات المزخرفة ---------- */
+.weekly-box,.quests-box,.stats-header,.form-box,.chart-container,.filter-controls,.attr-card,.modal-content{
+  position:relative;background:var(--panel);border:1px solid var(--border-color);box-shadow:var(--frame),0 12px 32px rgba(0,0,0,.5)}
+.weekly-box::before,.quests-box::before,.stats-header::before,.form-box::before,.chart-container::before,.attr-card::before{
+  content:"";position:absolute;top:-6px;left:50%;width:10px;height:10px;transform:translateX(-50%) rotate(45deg);
+  background:#0a0806;border:1px solid var(--gold);box-shadow:0 0 10px rgba(241,216,153,.55)}
+
+/* ---------- التحدي الأسبوعي (شريط الزعيم) ---------- */
+.weekly-box{padding:26px 28px 24px;margin-bottom:30px;text-align:center;border-color:rgba(168,44,38,.6);
+  box-shadow:var(--frame),0 0 44px rgba(143,24,24,.22),0 12px 32px rgba(0,0,0,.5)}
+.weekly-box::before{border-color:var(--blood-glow);box-shadow:0 0 12px rgba(217,64,47,.7)}
+.weekly-title{font-family:'Cinzel','Amiri',serif;color:var(--gold);font-size:17px;margin-bottom:12px;opacity:.9}
+.weekly-desc{font-size:27px;font-weight:700;color:#f3ead2;margin-bottom:16px;text-shadow:0 2px 10px rgba(0,0,0,.9)}
+.weekly-desc.done{text-decoration:line-through;opacity:.55}
+.weekly-row{display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap}
+.weekly-progress{font-size:17px;color:var(--text-main);font-family:'Cinzel','Amiri',serif}
+.weekly-bar{flex:1 1 100%;order:-1;height:16px;background:#150606;border:1px solid #6b5326;box-shadow:inset 0 0 8px #000,0 0 0 2px #0a0806,0 0 0 3px rgba(200,164,92,.35);overflow:hidden}
+.weekly-fill{height:100%;background:linear-gradient(180deg,#e0523f 0%,#9a1e1e 55%,#5c0f0f 100%);box-shadow:0 0 14px rgba(217,64,47,.6);transition:width .6s}
+
+/* ---------- المهام اليومية (مواقع النعمة) ---------- */
+.quests-box{padding:26px;margin-bottom:34px}
+.quests-header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:14px;
+  background:linear-gradient(to left,rgba(200,164,92,.7),transparent) bottom/100% 1px no-repeat}
+.quests-title{font-family:'Cinzel','Amiri',serif;color:var(--gold-glow);font-size:25px;font-weight:700}
+.quests-date{font-size:14px;color:var(--text-dim)}
+.quest-item{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 20px;margin-bottom:12px;
+  background:linear-gradient(to left,rgba(200,164,92,.08),rgba(0,0,0,.45) 60%);border:1px solid rgba(200,164,92,.16);border-right:3px solid var(--gold);transition:.25s}
+.quest-item:hover{background:linear-gradient(to left,rgba(200,164,92,.14),rgba(0,0,0,.5) 60%);border-right-color:var(--gold-glow)}
+.quest-item.completed{opacity:.5;border-right-color:#4b4332}
+.quest-item.completed .quest-text{text-decoration:line-through}
+.quest-main{display:flex;align-items:center;gap:18px}
+.grace-mark{position:relative;flex:none;width:22px;height:22px;transform:rotate(45deg);border:2px solid var(--gold-glow);background:radial-gradient(circle,#fff3d1 0 22%,rgba(241,216,153,.25) 60%,transparent 100%);
+  box-shadow:0 0 14px rgba(241,216,153,.7);animation:breathe 3.6s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 0 8px rgba(241,216,153,.45)}50%{box-shadow:0 0 20px rgba(241,216,153,.95)}}
+.quest-item.completed .grace-mark{animation:none;border-color:#5d5238;background:transparent;box-shadow:none}
+.quest-text{font-size:19px;font-weight:700;color:#f0e6cc}
+.quest-reward{font-size:14px;color:var(--gold);font-family:'Cinzel','Amiri',serif;margin-top:4px}
+
+/* ---------- الأزرار ---------- */
+.btn{background:rgba(14,11,8,.95);color:var(--gold);border:1px solid var(--gold);padding:10px 22px;font-family:'Cinzel','Amiri',serif;font-size:16px;cursor:pointer;
+  border-radius:2px;transition:.25s;white-space:nowrap;box-shadow:inset 0 0 0 2px #0a0806,inset 0 0 0 3px rgba(200,164,92,.2)}
+.btn:hover:not(:disabled){background:var(--gold);color:#120d05;box-shadow:0 0 14px rgba(200,164,92,.55)}
+.btn:disabled{border-color:#3a3427;color:#5d5645;cursor:not-allowed;background:transparent;box-shadow:none}
+.btn-sm{padding:7px 14px;font-size:14px}
+.btn-green{color:#86c797;border-color:var(--green)}
+.btn-green:hover:not(:disabled){background:var(--green);color:#06120a;box-shadow:0 0 12px rgba(79,154,98,.6)}
+.btn-orange{color:var(--orange);border-color:var(--orange)}
+.btn-orange:hover:not(:disabled){background:var(--orange);color:#120d05;box-shadow:0 0 12px rgba(224,153,62,.6)}
+.btn-red{color:#e5675a;border-color:var(--blood);background:rgba(26,6,6,.95)}
+.btn-red:hover:not(:disabled),.btn-red.active{background:var(--blood);color:#fff;box-shadow:0 0 14px rgba(217,64,47,.6)}
+.btn-purple{color:var(--purple-soft);border-color:var(--purple);background:rgba(20,12,30,.95)}
+.btn-purple:hover:not(:disabled){background:var(--purple);color:#fff;box-shadow:0 0 12px rgba(138,99,210,.6)}
+.btn-blue{background:#12233a;color:#cfe6ff;border-color:var(--blue)}
+.btn-blue:hover:not(:disabled){background:var(--blue);color:#fff;box-shadow:0 0 12px rgba(47,127,196,.6)}
+.btn.active{background:var(--gold);color:#120d05}
+.btn .arrow{display:inline-block;transition:transform .3s}
+.btn.active .arrow{transform:rotate(180deg)}
+.btn-wide{width:100%;padding:14px;font-size:18px;margin-top:10px}
+.btn-ghost{background:transparent;border-color:#4a4333;color:#8d836f}
+.btn-ghost:hover:not(:disabled){background:#1c1812;color:#fff;border-color:#8d836f;box-shadow:none}
+.btn-del{background:transparent;color:#6f664f;border:none;font-size:24px;cursor:pointer;transition:.3s;line-height:1;padding:0 6px}
+.btn-del:hover{color:var(--blood-glow);text-shadow:0 0 10px var(--blood-glow)}
+
+/* ---------- الإحصائيات ---------- */
+.stats-header{display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap;padding:26px;margin-bottom:34px}
+.health-box{flex:1 1 280px}
+.health-text{font-size:20px;font-family:'Cinzel',serif;color:#e5675a;margin-bottom:10px;letter-spacing:.12em;text-shadow:0 0 10px rgba(217,64,47,.5)}
+.health-bar{height:18px;background:#160505;border:1px solid #6b5326;box-shadow:inset 0 0 8px #000,0 0 0 2px #0a0806,0 0 0 3px rgba(200,164,92,.35);overflow:hidden}
+.health-fill{height:100%;background:linear-gradient(180deg,#e85a46 0%,#a52020 50%,#5c0f0f 100%);transition:width .6s;box-shadow:0 0 16px rgba(217,64,47,.6)}
+.side-stats{display:flex;gap:12px}
+.stat-box{text-align:center;background:#050403;padding:10px 26px;border:1px solid var(--gold);box-shadow:var(--frame),0 0 16px rgba(200,164,92,.25)}
+.stat-box.streak{border-color:#d9622f;box-shadow:var(--frame),0 0 16px rgba(217,98,47,.3)}
+.box-title{font-size:12px;color:var(--text-dim);font-family:'Cinzel',serif;letter-spacing:.3em;margin-bottom:4px;padding-left:.3em}
+.box-value{font-size:32px;font-family:'Cinzel',serif;font-weight:700;color:var(--gold-glow);text-shadow:0 0 14px rgba(200,164,92,.7)}
+.streak .box-value{color:#ff9a6a;text-shadow:0 0 14px rgba(255,110,50,.7)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:24px}
+.attr-card{padding:30px 20px 22px;text-align:center;transition:.3s}
+.attr-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:var(--frame),0 0 28px rgba(200,164,92,.25),0 12px 32px rgba(0,0,0,.5)}
+.attr-icon{width:58px;height:58px;margin:10px auto 26px;display:grid;place-items:center;transform:rotate(45deg);border:1px solid var(--gold);
+  background:radial-gradient(circle,rgba(241,216,153,.2),rgba(0,0,0,.7));box-shadow:0 0 18px rgba(200,164,92,.28),inset 0 0 12px #000}
+.attr-icon span{transform:rotate(-45deg);font-size:27px;line-height:1}
+.attr-name{font-family:'Cinzel','Amiri',serif;font-weight:700;font-size:21px;color:var(--gold-glow);margin-bottom:8px}
+.attr-level{display:flex;justify-content:center;align-items:baseline;gap:12px;margin-bottom:14px}
+.attr-level b{font-family:'Cinzel',serif;font-size:34px;line-height:1;color:#fff3d1;text-shadow:0 0 14px rgba(200,164,92,.6)}
+.attr-level span{font-family:'Cinzel',serif;font-size:13px;color:var(--text-dim)}
+.attr-bar{height:6px;background:#0d0b08;border:1px solid #4a3d22;overflow:hidden}
+.attr-fill{height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold-glow));box-shadow:0 0 10px var(--gold);transition:width .6s}
+
+/* ---------- الأفعال ---------- */
+.filter-controls{padding:20px;margin-bottom:34px;display:flex;flex-direction:column;gap:15px}
+.search-bar{width:100%;padding:14px;border:1px solid #3d3520;background:#0a0806;color:#eee;font-family:'Amiri',serif;font-size:18px;user-select:text}
+.search-bar:focus{outline:none;border-color:var(--gold);box-shadow:0 0 12px rgba(200,164,92,.3)}
+.filter-tabs{display:flex;flex-wrap:wrap;gap:10px}
+.filter-btn{background:#0d0b08;color:var(--text-dim);border:1px solid #3d3520;padding:7px 16px;font-family:'Cinzel','Amiri',serif;font-size:14px;cursor:pointer;transition:.2s;border-radius:2px}
+.filter-btn:hover{color:var(--gold);border-color:var(--gold)}
+.filter-btn.active{background:var(--gold);color:#120d05;border-color:var(--gold);box-shadow:0 0 12px rgba(200,164,92,.5);font-weight:700}
+
+.section-title{font-family:'Cinzel','Amiri',serif;font-size:25px;margin:44px 0 22px;padding-bottom:12px;display:flex;align-items:center;gap:10px;
+  background:linear-gradient(to left,rgba(200,164,92,.8),transparent) bottom/100% 1px no-repeat}
+.page>.section-title:first-child{margin-top:0}
+
+.action-item{background:linear-gradient(to left,rgba(200,164,92,.06),rgba(12,10,8,.92) 55%);border:1px solid rgba(200,164,92,.16);border-right:3px solid var(--gold);margin-bottom:14px;transition:.3s;box-shadow:0 6px 16px rgba(0,0,0,.5);overflow:hidden}
+.action-item:hover{border-color:rgba(200,164,92,.35);border-right-color:var(--gold-glow)}
+.action-item.bad{background:linear-gradient(to left,rgba(143,24,24,.14),rgba(14,7,7,.94) 55%);border-color:rgba(143,24,24,.3);border-right-color:var(--blood)}
+.action-item.bad:hover{border-color:rgba(217,64,47,.45);border-right-color:var(--blood-glow)}
+.action-item.simple{border-right-color:var(--green)}
+.action-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:15px 20px}
+.action-name{font-weight:700;font-size:19px;color:#f0e6cc;font-family:'Cinzel','Amiri',serif}
+.action-name small{font-size:12px;color:var(--text-dim);font-weight:400;margin-right:6px}
+.action-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+.tiers{display:none;padding:20px;background:rgba(0,0,0,.5);border-top:1px solid rgba(200,164,92,.15)}
+.tiers.show{display:block;animation:slideDown .25s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.slider-labels{display:flex;justify-content:space-between;margin-bottom:8px;font-family:'Cinzel','Amiri',serif;font-size:14px;color:var(--text-dim)}
+.slider-labels .easy{color:#7fc08f}.slider-labels .normal{color:var(--gold)}.slider-labels .hard{color:#e5675a}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{width:100%;height:8px;cursor:pointer;background:linear-gradient(90deg,#2e6b3e,var(--gold),var(--blood-glow));border:1px solid #000}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:22px;width:22px;margin-top:-8px;transform:rotate(45deg);background:radial-gradient(circle,#fff3d1,var(--gold));cursor:pointer;box-shadow:0 0 12px var(--gold-glow);border:1px solid #3a2a0c}
+input[type=range]::-moz-range-track{width:100%;height:8px;cursor:pointer;background:linear-gradient(90deg,#2e6b3e,var(--gold),var(--blood-glow));border:1px solid #000}
+input[type=range]::-moz-range-thumb{height:20px;width:20px;border-radius:0;transform:rotate(45deg);background:radial-gradient(circle,#fff3d1,var(--gold));cursor:pointer;box-shadow:0 0 12px var(--gold-glow);border:1px solid #3a2a0c}
+.slider-value{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(0,0,0,.55);padding:10px 15px;border:1px solid #3d3520;margin-top:12px}
+.slider-value .val-text{font-family:'Cinzel','Amiri',serif;font-size:16px;color:var(--gold-glow)}
+.slider-value .rew-text{font-size:14px;color:#cfc4aa}
+.btn-apply{width:100%;margin-top:12px;padding:12px;font-weight:700;background:linear-gradient(180deg,#e3c27a,#a8843c);color:#1a1206;border:1px solid #f1d899;font-family:'Cinzel','Amiri',serif;font-size:16px;border-radius:2px;cursor:pointer;transition:.3s;box-shadow:0 0 14px rgba(200,164,92,.4)}
+.btn-apply:hover{filter:brightness(1.15);box-shadow:0 0 22px rgba(241,216,153,.6)}
+.btn-apply.bad{background:linear-gradient(180deg,#b32525,#6e1010);color:#fff;border-color:#d9402f;box-shadow:0 0 14px rgba(143,24,24,.5)}
+.empty{text-align:center;color:var(--text-dim);padding:24px;font-family:'Cinzel','Amiri',serif}
+
+/* ---------- النماذج ---------- */
+.form-box{padding:28px;margin:18px 0 34px}
+.form-box>h3{margin-bottom:16px;font-size:21px}
+.form-row{display:flex;gap:15px;flex-wrap:wrap}
+.form-group{margin-bottom:18px;flex:1}
+.form-group label{display:block;margin-bottom:10px;font-size:16px;color:var(--gold);font-family:'Cinzel','Amiri',serif}
+.form-control{width:100%;padding:12px 15px;border:1px solid #3d3520;border-bottom:2px solid #6b5326;background:#0a0806;color:#eee;font-family:'Amiri',serif;font-size:16px;user-select:text;border-radius:0}
+.form-control:focus{outline:none;border-color:var(--gold);box-shadow:0 0 12px rgba(200,164,92,.3)}
+.attr-input-row{display:flex;gap:12px;margin-bottom:10px;align-items:center}
+.attr-input-row select{flex:2}.attr-input-row input{flex:1}
+.hint{color:var(--text-dim);font-size:14px;margin-top:10px}
+
+/* ---------- السجل ---------- */
+.log-item{background:linear-gradient(to left,rgba(200,164,92,.05),rgba(12,10,8,.9) 60%);padding:15px 20px;margin-bottom:10px;border:1px solid rgba(200,164,92,.14);border-right:3px solid #4b4332;display:flex;flex-direction:column;gap:10px}
+.log-item.quest{border-right-color:var(--green)}
+.log-item.bad{border-right-color:var(--blood-glow)}
+.log-item.achievement{border-right-color:var(--gold-glow);background:linear-gradient(to left,rgba(241,216,153,.1),rgba(12,10,8,.9) 60%)}
+.log-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.log-action{font-weight:700;color:#f0e6cc;font-size:17px}
+.log-reward{font-size:13px;color:var(--gold);font-family:'Cinzel','Amiri',serif;margin-top:4px}
+.log-time{font-size:12px;color:var(--text-dim);white-space:nowrap}
+.log-note{background:rgba(47,127,196,.1);border-right:2px solid var(--blue);padding:10px;font-size:15px;color:#bcd9f2;font-style:italic;white-space:pre-wrap;user-select:text}
+.log-actions{display:flex;gap:10px;justify-content:flex-end}
+.btn-log{background:transparent;border:1px solid #4a4333;color:var(--text-dim);padding:4px 10px;cursor:pointer;font-size:12px;font-family:'Cinzel','Amiri',serif;transition:.2s;border-radius:2px}
+.btn-log:hover{color:#fff;border-color:#fff}
+.btn-log.edit:hover{border-color:var(--blue);color:#7fb3e0}
+.btn-log.delete:hover{border-color:var(--blood-glow);color:var(--blood-glow)}
+
+.chart-container{padding:20px;height:600px;max-height:70vh}
+
+/* ---------- النوافذ ---------- */
+.modal{position:fixed;inset:0;background:rgba(3,2,2,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;justify-content:center;align-items:center;z-index:1000;padding:15px;overflow-y:auto}
+.modal.open{display:flex}
+.modal-content{padding:40px;text-align:center;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:appear .45s ease-out}
+@keyframes appear{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+.modal-content h2{font-size:30px;margin-bottom:20px}
+.modal-content p{font-size:20px;margin-bottom:25px;color:#e6dcc3;line-height:1.7}
+.modal-content .form-group{text-align:right}
+.modal.note .modal-content{border-color:rgba(47,127,196,.6);box-shadow:var(--frame),0 0 50px rgba(47,127,196,.25)}
+.modal.note h2,.modal.note label{color:#7fb3e0}
+.modal.ach .modal-content{border-color:rgba(138,99,210,.6);box-shadow:var(--frame),0 0 60px rgba(138,99,210,.3)}
+.modal.ach h2,.modal.ach label{color:var(--purple-soft)}
+.modal.edit-good .modal-content{border-color:rgba(79,154,98,.6)}
+.modal.edit-good h2{color:#86c797}
+.modal.edit-bad .modal-content{border-color:rgba(224,153,62,.6)}
+.modal.edit-bad h2,.modal.edit-bad label{color:var(--orange)}
+.modal.notice{z-index:1100}
+.modal.notice .modal-content{border-color:rgba(200,164,92,.7);box-shadow:var(--frame),0 0 60px rgba(200,164,92,.25)}
+.modal.notice h2{font-family:'Cinzel Decorative','Cinzel',serif;font-size:26px;letter-spacing:.12em;color:var(--gold-glow);filter:drop-shadow(0 0 10px rgba(241,216,153,.4))}
+.modal.notice p{white-space:pre-line}
+.btn-yes{background:linear-gradient(180deg,#e3c27a,#a8843c);color:#1a1206;border:1px solid #f1d899;padding:14px 34px;font-family:'Cinzel','Amiri',serif;font-size:20px;font-weight:700;border-radius:2px;cursor:pointer;transition:.3s;margin-left:10px;box-shadow:0 0 20px rgba(200,164,92,.4)}
+.btn-yes:hover{filter:brightness(1.15);transform:scale(1.03)}
+.btn-no{background:transparent;color:var(--text-dim);border:1px solid #4a4333;padding:14px 34px;font-family:'Cinzel','Amiri',serif;font-size:20px;border-radius:2px;cursor:pointer;transition:.3s}
+.btn-no:hover{background:#1c1812;color:#fff;border-color:#8d836f}
+
+/* شاشة الموت */
+.modal.death{z-index:1050;background:radial-gradient(ellipse at center,rgba(40,0,0,.88),rgba(0,0,0,.97))}
+.modal.death .modal-content{max-width:none;width:100%;border:none;box-shadow:none;padding:70px 20px;
+  background:linear-gradient(to bottom,transparent,rgba(0,0,0,.96) 22%,rgba(0,0,0,.96) 78%,transparent);animation:deathIn 2.2s ease-out}
+@keyframes deathIn{from{opacity:0;letter-spacing:.35em}to{opacity:1}}
+.modal.death h2{font-family:'Cinzel Decorative','Cinzel',serif;font-weight:900;font-size:clamp(46px,12vw,118px);letter-spacing:.14em;color:#9b1c1c;text-shadow:0 0 40px rgba(143,24,24,.8);margin-bottom:24px;padding-left:.14em}
+
+/* لافتة الحدث */
+.banner{position:fixed;left:0;right:0;top:32%;z-index:1500;text-align:center;padding:36px 12px;pointer-events:none;opacity:0;transform:scale(1.06);
+  transition:opacity .9s ease,transform 1.6s ease;background:linear-gradient(to bottom,transparent,rgba(0,0,0,.84) 28%,rgba(0,0,0,.84) 72%,transparent)}
+.banner.show{opacity:1;transform:none}
+.banner-title{font-family:'Cinzel Decorative','Cinzel',serif;font-weight:700;font-size:clamp(26px,6.4vw,56px);letter-spacing:.2em;color:var(--gold-glow);filter:drop-shadow(0 0 16px rgba(241,216,153,.55));padding-left:.2em}
+.banner-sub{font-size:21px;color:var(--text-main);margin-top:8px}
+
+.toast{position:fixed;top:70px;left:20px;z-index:300;background:rgba(10,8,6,.94);border:1px solid var(--gold);color:var(--gold-glow);padding:8px 16px;border-radius:2px;
+  font-family:'Cinzel','Amiri',serif;font-size:13px;box-shadow:var(--frame),0 0 15px rgba(200,164,92,.3);opacity:0;transform:translateY(-10px);transition:opacity .4s,transform .4s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+
+@media (max-width:600px){
+  .page{padding:20px 16px}
+  .top-btn{padding:8px 14px;font-size:14px}
+  .nav-btn{font-size:15px;padding:0 4px}
+  .modal-content{padding:26px}
+  .weekly-desc{font-size:22px}
+  .side-stats{width:100%}.stat-box{flex:1;padding:10px}
+  .hero-sub{letter-spacing:.35em}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- v3: الرونات، الخريطة، المتجر، الجوال ---------- */
+body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+.top-bar{padding-top:calc(12px + env(safe-area-inset-top))}
+.nav-bar{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.stat-box.runes{border-color:var(--gold-glow);box-shadow:var(--frame),0 0 18px rgba(241,216,153,.3)}
+.shield-line{font-size:12px;color:#8fc0ee;margin-top:2px;font-family:'Cinzel','Amiri',serif}
+.rune-gem{display:inline-block;width:14px;height:14px;transform:rotate(45deg);border:2px solid var(--gold-glow);
+  background:radial-gradient(circle,#fff3d1 0 25%,rgba(241,216,153,.3) 70%);box-shadow:0 0 12px rgba(241,216,153,.8);margin:0 6px 0 14px;vertical-align:middle}
+.heat-box{position:relative;margin-top:36px;padding:24px;background:var(--panel);border:1px solid var(--border-color);box-shadow:var(--frame),0 12px 32px rgba(0,0,0,.5)}
+.heat-box::before{content:"";position:absolute;top:-6px;left:50%;width:10px;height:10px;transform:translateX(-50%) rotate(45deg);background:#0a0806;border:1px solid var(--gold);box-shadow:0 0 10px rgba(241,216,153,.55)}
+.heat-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.heat-title{font-size:22px}
+.heat-stats{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--text-dim)}
+.heat-stats b{font-family:'Cinzel',serif;color:var(--gold-glow);font-size:16px}
+.heat-scroll{overflow-x:auto;padding:4px 2px 8px}
+.heatmap{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,15px);grid-auto-columns:15px;gap:4px;direction:rtl;width:max-content;margin:0 auto}
+.hm{display:block;width:15px;height:15px;background:#120f0a;border:1px solid #2a2417}
+.hm.none{background:transparent;border-color:transparent}
+.hm.l1{background:rgba(200,164,92,.28);border-color:rgba(200,164,92,.4)}
+.hm.l2{background:rgba(200,164,92,.5);border-color:rgba(200,164,92,.6)}
+.hm.l3{background:rgba(226,190,112,.78);border-color:#e3c27a}
+.hm.l4{background:linear-gradient(135deg,#fff3d1,#e3c27a);border-color:#fff3d1;box-shadow:0 0 8px rgba(241,216,153,.7)}
+.hm.shield{background:rgba(47,127,196,.55);border-color:#7fb3e0;box-shadow:0 0 8px rgba(47,127,196,.6)}
+.hm.today{outline:1px solid var(--gold-glow);outline-offset:1px}
+.heat-legend{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;font-size:12px;color:var(--text-dim)}
+.heat-legend .hm{width:12px;height:12px}
+.runes-hero{text-align:center;padding:26px 20px 30px;margin-bottom:6px}
+.runes-label{font-family:'Cinzel',serif;letter-spacing:.4em;font-size:13px;color:var(--gold);padding-left:.4em}
+.runes-value{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(44px,10vw,76px);color:var(--gold-glow);filter:drop-shadow(0 0 18px rgba(241,216,153,.45));margin:8px 0}
+.cost{font-family:'Cinzel','Amiri',serif;color:var(--gold-glow);font-size:16px}
+.action-item.shield{border-right-color:var(--blue)}
+@media (max-width:600px){.nav-btn{font-size:13px;padding:0 2px}}
+</style>
+</head>
+<body>
+<div class="atmos" aria-hidden="true"></div><div class="fog" aria-hidden="true"></div><canvas id="embers" aria-hidden="true"></canvas>
+
+<div class="top-bar">
+  <button class="top-btn" id="audioBtn" data-act="toggle-audio">🔇 اضغط لتفعيل الصوت</button>
+  <button class="top-btn undo" id="undoBtn" data-act="undo">↩️ تراجع</button>
+  <button class="top-btn" id="installBtn" data-act="install" hidden>📲 تثبيت</button>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<!-- المقام -->
+<main>
+<section id="page1" class="page active">
+  <header class="hero">
+    <svg class="erdtree" id="erdtree" viewBox="0 0 400 250" aria-hidden="true"></svg>
+    <h1 class="hero-title">ELDEN RPG</h1>
+    <div class="hero-sub">LEGENDARY EDITION</div>
+    <div class="ornament"></div>
+  </header>
+
+  <div class="weekly-box">
+    <div class="weekly-title">⚔️ التحدي الأسبوعي (Boss Challenge)</div>
+    <div class="weekly-desc" id="weeklyDesc"></div>
+    <div class="weekly-row">
+      <div class="weekly-progress" id="weeklyProgress"></div>
+      <button class="btn btn-sm btn-purple" id="weeklyBtn" data-act="weekly-add">➕ تسجيل تقدم</button>
+      <div class="weekly-bar"><div class="weekly-fill" id="weeklyFill"></div></div>
+    </div>
+  </div>
+
+  <div class="quests-box">
+    <div class="quests-header">
+      <div class="quests-title">☀ مهام اليوم الإلزامية</div>
+      <div class="quests-date" id="questDate"></div>
+    </div>
+    <div id="dailyQuestsList"></div>
+  </div>
+
+  <div class="stats-header">
+    <div class="health-box">
+      <div class="health-text">HP: <span id="healthVal">1000</span> / 1000</div>
+      <div class="health-bar"><div class="health-fill" id="healthBar"></div></div>
+    </div>
+    <div class="side-stats">
+      <div class="stat-box streak"><div class="box-title">STREAK</div><div class="box-value">🔥 <span id="streakVal">0</span></div><div class="shield-line" id="shieldLine"></div></div>
+      <div class="stat-box runes"><div class="box-title">RUNES</div><div class="box-value" id="runesVal">0</div></div>
+      <div class="stat-box"><div class="box-title">LEVEL</div><div class="box-value" id="globalLevel">0</div></div>
+    </div>
+  </div>
+  <div class="grid" id="attributesGrid"></div>
+
+  <div class="heat-box">
+    <div class="heat-head">
+      <h3 class="heat-title">🗓️ خريطة الالتزام</h3>
+      <div class="heat-stats" id="heatStats"></div>
+    </div>
+    <div class="heat-scroll"><div class="heatmap" id="heatmap"></div></div>
+    <div class="heat-legend">
+      <span>أقل</span><i class="hm"></i><i class="hm l1"></i><i class="hm l2"></i><i class="hm l3"></i><i class="hm l4"></i><span>يوم كامل</span>
+      <i class="hm shield" style="margin-right:12px"></i><span>محمي بدرع</span>
+    </div>
+  </div>
+</section>
+
+<!-- الأفعال -->
+<section id="page2" class="page">
+  <div class="filter-controls">
+    <input type="text" id="searchInput" class="search-bar" placeholder="🔍 ابحث عن فعل معين..." aria-label="بحث">
+    <div class="filter-tabs" id="filterTabs"></div>
+  </div>
+  <h2 class="section-title">✦ أفعال إيجابية</h2>
+  <div id="goodActionsList"></div>
+  <h2 class="section-title" style="color:var(--blood-glow)">☠ أفعال سيئة</h2>
+  <div id="badActionsList"></div>
+</section>
+
+<!-- العهد -->
+<section id="page3" class="page">
+  <h2 class="section-title" style="color:var(--blue)">💾 النسخ الاحتياطي والاستعادة</h2>
+  <div class="form-box" style="border-color:var(--blue)">
+    <p style="margin-bottom:15px;font-size:15px">احفظ نسخة من بياناتك لاستعادتها إذا مُسح المتصفح أو تغيّر الجهاز.</p>
+    <div class="form-row">
+      <button class="btn btn-wide btn-blue" style="margin-top:0;flex:1" data-act="export">📥 تصدير البيانات</button>
+      <button class="btn btn-wide btn-blue" style="margin-top:0;flex:1" data-act="import">📤 استيراد البيانات</button>
+      <input type="file" id="importFile" accept=".json" hidden>
+    </div>
+    <p style="color:var(--green);margin-top:15px;font-size:13px">💾 الحفظ التلقائي مفعّل: تُحفظ بياناتك بعد كل تعديل وعند إغلاق الصفحة.</p>
+  </div>
+
+  <h2 class="section-title">📲 تثبيت التطبيق على هاتفك</h2>
+  <div class="form-box">
+    <p style="margin-bottom:12px;font-size:16px;line-height:1.8">ثبّته ليظهر بأيقونة على شاشتك ويعمل بلا إنترنت.</p>
+    <button class="btn btn-wide" style="margin-top:0" data-act="install">📲 ثبّت التطبيق</button>
+    <p class="hint">أندرويد (Chrome): القائمة ⋮ ← «تثبيت التطبيق». آيفون (Safari): المشاركة ← «إضافة إلى الشاشة الرئيسية». يلزم فتحه من رابط https.</p>
+  </div>
+
+  <h2 class="section-title" style="color:var(--green)">☀ إدارة المهام اليومية الإلزامية</h2>
+  <div id="dailyQuestsManageList"></div>
+  <div class="form-box">
+    <h3 style="color:var(--green)">إضافة مهمة يومية</h3>
+    <div class="form-group"><label for="newQuestText">نص المهمة</label><input type="text" id="newQuestText" class="form-control" placeholder="مثال: 🧘 التأمل 10 دقائق"></div>
+    <div class="form-group">
+      <label>الصفة والمكافأة</label>
+      <div class="attr-input-row"><select id="newQuestAttr1" class="form-control"></select><input type="number" id="newQuestPts1" class="form-control" value="50" min="1"></div>
+      <div class="attr-input-row"><select id="newQuestAttr2" class="form-control"></select><input type="number" id="newQuestPts2" class="form-control" value="20" min="0"></div>
+    </div>
+    <button class="btn btn-wide btn-green" data-act="add-quest">+ إضافة المهمة اليومية</button>
+  </div>
+
+  <h2 class="section-title">🏆 قائمة المكافآت</h2>
+  <div id="rewardsList"></div>
+  <div class="form-box">
+    <h3>إضافة مكافأة</h3>
+    <div class="form-group"><label for="newRewardName">المكافأة</label><input type="text" id="newRewardName" class="form-control" placeholder="مثال: شراء وجبة مفضلة"></div>
+    <div class="form-group"><label for="newRewardCost">السعر بالرونات</label><input type="number" id="newRewardCost" class="form-control" value="500" min="1"></div>
+    <button class="btn btn-wide" data-act="add-reward">سَجّل المكافأة</button>
+  </div>
+
+  <h2 class="section-title" style="color:var(--blood-glow)">⛔ قائمة العقوبات</h2>
+  <div id="punishmentsList"></div>
+  <div class="form-box">
+    <h3 style="color:var(--blood-glow)">إضافة عقوبة</h3>
+    <div class="form-group"><label for="newPunishmentName">العقوبة</label><input type="text" id="newPunishmentName" class="form-control" placeholder="مثال: عدم استخدام الهاتف ليوم"></div>
+    <button class="btn btn-wide btn-red" data-act="add-punishment">سَجّل العقوبة</button>
+  </div>
+
+  <h2 class="section-title">⚙️ إضافة فعل جديد</h2>
+  <div class="form-box">
+    <div class="form-group"><label for="newActionName">اسم الفعل</label><input type="text" id="newActionName" class="form-control" placeholder="مثال: الامتنان"></div>
+    <div class="form-group">
+      <label for="actionType">نوع الفعل</label>
+      <select id="actionType" class="form-control"><option value="good">إيجابي (يزيد النقاط)</option><option value="bad">سلبي (ينقص الصحة)</option></select>
+    </div>
+    <div id="goodFields">
+      <div class="attr-input-row"><select id="goodAttr1" class="form-control"></select><input type="number" id="goodPts1" class="form-control" value="40" min="1"></div>
+      <div class="attr-input-row"><select id="goodAttr2" class="form-control"></select><input type="number" id="goodPts2" class="form-control" value="20" min="0"></div>
+      <div class="attr-input-row"><select id="goodAttr3" class="form-control"></select><input type="number" id="goodPts3" class="form-control" value="10" min="0"></div>
+      <p class="hint">النقاط المكتوبة هي الحد «العادي» (سهل = ÷2، عادي = ×1، صعب = ×2).</p>
+    </div>
+    <div id="badFields" hidden>
+      <div class="form-group"><label for="badHealthLoss">مقدار النقصان في الصحة (عادي)</label><input type="number" id="badHealthLoss" class="form-control" value="50" min="1"></div>
+    </div>
+    <button class="btn btn-wide" data-act="add-action">أضف الفعل</button>
+  </div>
+</section>
+
+<!-- المتجر -->
+<section id="page6" class="page">
+  <div class="runes-hero">
+    <div class="runes-label">RUNES HELD</div>
+    <div class="runes-value"><span class="rune-gem"></span><span id="shopRunes">0</span></div>
+    <p class="hint">تكسب الرونات من المهام والأفعال والأيام الكاملة، وتصرفها على مكافآتك.</p>
+  </div>
+  <h2 class="section-title" style="color:#8fc0ee">🛡️ درع الراحة</h2>
+  <div id="shieldShop"></div>
+  <h2 class="section-title">🏆 مكافآتك</h2>
+  <div id="rewardShop"></div>
+  <p class="hint" style="margin-top:14px">لإضافة مكافأة أو تعديل سعرها: صفحة «العهد».</p>
+</section>
+
+<!-- السجل -->
+<section id="page4" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <h2 class="section-title" style="margin:0;border:none;padding:0">📜 سجل الأحداث والمذكرات</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-purple" data-act="open-achievement">🏆 إضافة إنجاز</button>
+      <button class="btn" data-act="open-note">📝 إضافة ملاحظة يدوية</button>
+    </div>
+  </div>
+  <div id="activityLogList"></div>
+</section>
+
+<!-- التوازن -->
+<section id="page5" class="page">
+  <h2 class="section-title">📊 توازن الصفات</h2>
+  <div class="chart-container"><canvas id="radarChart"></canvas></div>
+  <p style="text-align:center;color:#888;margin-top:20px;font-size:14px">كلما ابتعدت النقطة عن المركز كانت الصفة أقوى.<br>اسعَ لشكل متوازن بدل أن يمتد في جهة واحدة.</p>
+</section>
+</main>
+
+<nav class="nav-bar">
+  <button class="nav-btn active" data-act="page" data-page="1">المقام</button>
+  <button class="nav-btn" data-act="page" data-page="2">الأفعال</button>
+  <button class="nav-btn" data-act="page" data-page="6">المتجر</button>
+  <button class="nav-btn" data-act="page" data-page="3">العهد</button>
+  <button class="nav-btn" data-act="page" data-page="4">السجل</button>
+  <button class="nav-btn" data-act="page" data-page="5">التوازن</button>
+</nav>
+
+<div class="banner" id="banner" aria-live="polite"><div class="banner-title" id="bannerTitle"></div><div class="banner-sub" id="bannerSub"></div></div>
+
+<!-- نافذة الإشعارات -->
+<div class="modal notice" id="noticeModal">
+  <div class="modal-content">
+    <h2 id="noticeTitle"></h2>
+    <p id="noticeText"></p>
+    <button class="btn" data-act="close-notice">حسناً</button>
+  </div>
+</div>
+
+<!-- نافذة الملاحظة -->
+<div class="modal note" id="noteModal">
+  <div class="modal-content">
+    <h2 id="noteModalTitle">إضافة ملاحظة</h2>
+    <div class="form-group"><label for="noteInput">اكتب المعلومة أو الملاحظة هنا:</label>
+      <textarea id="noteInput" class="form-control" rows="4" style="resize:none" placeholder="مثال: تعلمت اليوم كلمات فرنسية جديدة عن الطعام..."></textarea></div>
+    <input type="hidden" id="noteLogId">
+    <button class="btn btn-wide" style="background:var(--blue);border-color:var(--blue);color:#fff" data-act="save-note">حفظ الملاحظة</button>
+    <button class="btn btn-wide btn-ghost" data-act="close-modal" data-modal="noteModal">إلغاء</button>
+  </div>
+</div>
+
+<!-- نافذة الإنجاز -->
+<div class="modal ach" id="achievementModal">
+  <div class="modal-content">
+    <h2>🏆 إضافة إنجاز</h2>
+    <div class="form-group"><label for="achName">اسم الإنجاز:</label><input type="text" id="achName" class="form-control" placeholder="مثال: إكمال كتاب مئة عام من العزلة"></div>
+    <div class="form-group"><label for="achDetails">تفاصيل إضافية (اختياري):</label><textarea id="achDetails" class="form-control" rows="3" style="resize:none" placeholder="مثال: 350 صفحة في 5 أيام..."></textarea></div>
+    <button class="btn btn-wide" style="background:var(--purple);border-color:var(--purple);color:#fff" data-act="save-achievement">إضافة الإنجاز</button>
+    <button class="btn btn-wide btn-ghost" data-act="close-modal" data-modal="achievementModal">إلغاء</button>
+  </div>
+</div>
+
+<!-- مكافأة الإنجاز -->
+<div class="modal ach" id="achievementRewardModal">
+  <div class="modal-content">
+    <h2>🏆 إنجاز رائع!</h2>
+    <p style="color:var(--purple-soft);margin-bottom:10px">لقد أضفت إنجازاً جديداً:</p>
+    <p id="achievementRewardName" style="font-size:24px;color:var(--gold-glow);font-weight:bold"></p>
+    <p style="font-size:18px;color:#ccc">هل يستحق هذا الإنجاز مكافأة +100 نقطة صحة؟</p>
+    <div>
+      <button class="btn-yes" data-act="grant-achievement" data-grant="1">✅ نعم، أستحقها</button>
+      <button class="btn-no" data-act="grant-achievement" data-grant="0">❌ لا، شكراً</button>
+    </div>
+  </div>
+</div>
+
+<!-- تعديل فعل إيجابي -->
+<div class="modal edit-good" id="editGoodModal">
+  <div class="modal-content">
+    <h2 id="editGoodTitle">تعديل النقاط</h2>
+    <div id="editAttrsContainer" style="text-align:right;margin-bottom:15px"></div>
+    <input type="hidden" id="editGoodId">
+    <button class="btn btn-wide btn-green" data-act="edit-add-row">+ إضافة صفة جديدة</button>
+    <button class="btn btn-wide" style="background:var(--green);border-color:var(--green);color:#fff" data-act="save-edit-good">حفظ التعديلات</button>
+    <button class="btn btn-wide btn-ghost" data-act="close-modal" data-modal="editGoodModal">إلغاء</button>
+  </div>
+</div>
+
+<!-- تعديل فعل سيئ -->
+<div class="modal edit-bad" id="editBadModal">
+  <div class="modal-content">
+    <h2 id="editBadTitle">تعديل الفعل السيئ</h2>
+    <div class="form-group"><label for="editBadLoss">مقدار النقصان في الصحة (عادي)</label>
+      <input type="number" id="editBadLoss" class="form-control" min="1" style="font-size:20px;text-align:center"></div>
+    <input type="hidden" id="editBadId">
+    <button class="btn btn-wide" style="background:var(--orange);border-color:var(--orange);color:#000;font-weight:bold" data-act="save-edit-bad">حفظ التعديلات</button>
+    <button class="btn btn-wide btn-ghost" data-act="close-modal" data-modal="editBadModal">إلغاء</button>
+  </div>
+</div>
+
+<!-- نافذة الموت -->
+<div class="modal death" id="deathModal">
+  <div class="modal-content">
+    <h2>YOU DIED</h2>
+    <p style="color:var(--blood-glow);font-family:'Cinzel','Amiri',serif;font-size:24px;margin-bottom:10px">لقد استنفدت طاقتك..</p>
+    <p id="punishmentText" style="color:#fff"></p>
+    <button class="btn btn-red" style="font-size:20px;padding:14px 46px" data-act="revive">استيقظ من جديد</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* =====================================================
+   الثوابت والأدوات
+   ===================================================== */
+const STORAGE_KEY  = 'rpgData_v37';            // نفس المفتاح القديم: بياناتك الحالية تُحمَّل كما هي
+const AUTOSAVE_KEY = 'rpgData_v37_autosave';
+const MAX_HP = 1000, LEVEL_HEAL = 100, UNDO_LIMIT = 20;
+const MAX_SHIELDS = 2, SHIELD_PRICE = 800, DEFAULT_REWARD_COST = 500;
+const ALL_DONE_BONUS = 100, WEEKLY_RUNES = 300, STREAK7_RUNES = 300;
+
+const ATTR_NAMES = {
+  strength: 'القوة', endurance: 'الصلابة', mind: 'العقل', skill: 'المهارة',
+  social: 'الاجتماعي', wealth: 'الثروة', faith: 'الإيمان', creativity: 'الإبداع'
+};
+
+const WEEKLY_POOL = [
+  { id: 'read_100',   name: 'اقرأ 100 صفحة هذا الأسبوع', target: 100, keywords: [] },
+  { id: 'workout_4',  name: 'تمرن 4 مرات هذا الأسبوع',    target: 4,   keywords: ['تمرين', 'تمرن', 'الرياضة', 'Gym', 'الأثقال'] },
+  { id: 'meditate_5', name: 'تأمل 5 مرات هذا الأسبوع',    target: 5,   keywords: ['تأمل', 'التأمل'] },
+  { id: 'no_sugar_3', name: 'امتنع عن السكر 3 أيام',      target: 3,   keywords: [] }
+];
+
+const $ = id => document.getElementById(id);
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const sameId = (a, b) => String(a) === String(b);
+let idCounter = 0;
+const newId = () => Date.now() * 1000 + (idCounter++ % 1000);
+const dayKey = (d = new Date()) => d.toDateString();
+const localDateKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+function tier(v) {
+  v = Number(v);
+  if (v <= 33) return { mult: 0.5, label: 'سهل' };
+  if (v <= 66) return { mult: 1, label: 'عادي' };
+  return { mult: 2, label: 'صعب' };
+}
+
+/* =====================================================
+   البيانات الافتراضية والتحميل
+   ===================================================== */
+const defaultData = () => ({
+  health: MAX_HP, globalLevel: 0, streak: 0, lastStreakDate: null,
+  runes: 0, lifetimeRunes: 0, shields: 0, bestStreak: 0, history: {},
+  lastPlayedDate: dayKey(), completedDailyQuests: [], activityLog: [], weeklyChallenge: null,
+  dailyQuests: [
+    { id: 1, text: '🗣️ تمارين الصوت', attrs: ['social'], points: [50] },
+    { id: 2, text: '🏃 ممارسة الرياضة', attrs: ['strength', 'endurance'], points: [50, 20] },
+    { id: 3, text: '🇫🇷 تعلم اللغة الفرنسية', attrs: ['mind'], points: [50] }
+  ],
+  attributes: {
+    strength:   { name: 'القوة',     icon: '⚔️', points: 0, level: 16, required: 1000 },
+    endurance:  { name: 'الصلابة',   icon: '🛡️', points: 0, level: 25, required: 1000 },
+    mind:       { name: 'العقل',     icon: '🧠', points: 0, level: 28, required: 1000 },
+    skill:      { name: 'المهارة',   icon: '🏹', points: 0, level: 26, required: 1000 },
+    social:     { name: 'الاجتماعي', icon: '🤝', points: 0, level: 26, required: 1000 },
+    wealth:     { name: 'الثروة',    icon: '🪙', points: 0, level: 14, required: 1000 },
+    faith:      { name: 'الإيمان',   icon: '✨', points: 0, level: 20, required: 1000 },
+    creativity: { name: 'الإبداع',   icon: '🎨', points: 0, level: 22, required: 1000 }
+  },
+  goodActions: [
+    { id: 101, name: 'رفع الأثقال (Gym)', attrRewards: [{ attr: 'strength', basePts: 40 }, { attr: 'endurance', basePts: 20 }] },
+    { id: 102, name: 'الاستحمام بالماء البارد', attrRewards: [{ attr: 'endurance', basePts: 40 }, { attr: 'faith', basePts: 10 }] },
+    { id: 103, name: 'قراءة كتاب', attrRewards: [{ attr: 'mind', basePts: 30 }, { attr: 'creativity', basePts: 10 }] },
+    { id: 104, name: 'العمل العميق (Deep Work)', attrRewards: [{ attr: 'skill', basePts: 30 }, { attr: 'mind', basePts: 20 }] },
+    { id: 105, name: 'الاستماع الفعال لصديق', attrRewards: [{ attr: 'social', basePts: 30 }, { attr: 'faith', basePts: 10 }] },
+    { id: 106, name: 'تسجيل المصروفات', attrRewards: [{ attr: 'wealth', basePts: 30 }, { attr: 'mind', basePts: 10 }] },
+    { id: 107, name: 'الامتنان (شكر النعم)', attrRewards: [{ attr: 'faith', basePts: 30 }, { attr: 'endurance', basePts: 30 }] },
+    { id: 108, name: 'الكتابة الإبداعية', attrRewards: [{ attr: 'creativity', basePts: 40 }, { attr: 'mind', basePts: 10 }] }
+  ],
+  badActions: [
+    { id: 201, name: 'مشاهدة محتوى إباحي', baseLoss: 50 },
+    { id: 202, name: 'العادة السرية', baseLoss: 200 },
+    { id: 203, name: 'تصفح سوشيال ميديا بلا هدف', baseLoss: 30 },
+    { id: 204, name: 'السهر وتأخير النوم', baseLoss: 30 },
+    { id: 205, name: 'التسويف وتأجيل المهام', baseLoss: 25 }
+  ],
+  rewards: [
+    { id: 1, name: '🍕 تناول وجبتك المفضلة' }, { id: 2, name: '🎮 لعب ساعة إضافية' },
+    { id: 3, name: '🎬 مشاهدة فيلم' }, { id: 4, name: '🛌 أخذ قيلولة طويلة' },
+    { id: 5, name: '🛍️ شراء شيء بسيط' }, { id: 6, name: '☕ الذهاب لمقهى' }
+  ],
+  punishments: [
+    { id: 1, name: 'صيام عن الهاتف لمدة يوم كامل' }, { id: 2, name: '100 تمرين ضغط' },
+    { id: 3, name: 'الاستيقاظ مبكراً ساعة إضافية' }, { id: 4, name: 'منع السكريات لمدة 3 أيام' },
+    { id: 5, name: 'الجلوس في صمت تام 30 دقيقة' }
+  ]
+});
+
+/** يملأ أي حقول ناقصة ويرحّل البيانات القديمة (legendLog، playerTitle) */
+function normalize(raw) {
+  const d = Object.assign(defaultData(), raw || {});
+  delete d.playerTitle;
+  delete d._migratedToV37;
+  d.activityLog = Array.isArray(d.activityLog) ? d.activityLog : [];
+  if (Array.isArray(d.legendLog)) {
+    d.legendLog.forEach(l => {
+      if (!d.activityLog.some(a => sameId(a.id, l.id)))
+        d.activityLog.unshift({ id: l.id, action: l.action, reward: l.detail, time: l.time, type: 'achievement', note: '' });
+    });
+  }
+  delete d.legendLog;
+  ['dailyQuests', 'completedDailyQuests', 'goodActions', 'badActions', 'rewards', 'punishments'].forEach(k => {
+    if (!Array.isArray(d[k])) d[k] = defaultData()[k];
+  });
+  d.rewards.forEach(r => { if (!(r.cost > 0)) r.cost = DEFAULT_REWARD_COST; });
+  if (!d.history || typeof d.history !== 'object') d.history = {};
+  const cutoff = Date.now() - 400 * 864e5;
+  for (const k of Object.keys(d.history)) { if (new Date(k).getTime() < cutoff) delete d.history[k]; }
+  d.runes = Math.max(0, +d.runes || 0);
+  d.shields = Math.min(MAX_SHIELDS, Math.max(0, +d.shields || 0));
+  d.bestStreak = Math.max(+d.bestStreak || 0, +d.streak || 0);
+  // أزل أي صفة قديمة لا تملك الحقول الأساسية
+  const base = defaultData().attributes;
+  for (const k of Object.keys(base)) d.attributes[k] = Object.assign({}, base[k], d.attributes[k] || {});
+  return d;
+}
+
+function loadData() {
+  let main = null, backup = null;
+  try { main = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+  try { backup = localStorage.getItem(AUTOSAVE_KEY); } catch (e) {}
+  if (main) { try { return normalize(JSON.parse(main)); } catch (e) { console.warn('main data corrupt', e); } }
+  if (backup) {
+    try {
+      const parsed = JSON.parse(backup);
+      if (parsed && parsed.data && confirm('لم نجد بياناتك الأساسية. هل تريد استعادتها من آخر حفظ تلقائي؟'))
+        return normalize(parsed.data);
+    } catch (e) {}
+  }
+  return normalize(null);
+}
+
+let data = loadData();
+let currentFilter = 'all';
+let currentSearch = '';
+let radarChart = null;
+let pendingAchievement = null;
+
+/* =====================================================
+   الصوت
+   ===================================================== */
+let soundEnabled = false;
+const sounds = {};
+function sfx(name) {
+  if (!soundEnabled || typeof Howl === 'undefined') return;
+  const urls = {
+    bg:     ['https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=dark-fantasy-ambient-114711.mp3', 0.4, true],
+    click:  ['https://www.soundjay.com/buttons/sounds/button-16.mp3', 0.6, false],
+    reward: ['https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3', 0.7, false],
+    death:  ['https://www.soundjay.com/human/sounds/breathing-1.mp3', 1.0, false]
+  };
+  try {
+    if (!sounds[name]) sounds[name] = new Howl({ src: [urls[name][0]], volume: urls[name][1], loop: urls[name][2] });
+    sounds[name].play();
+  } catch (e) {}
+}
+function toggleAudio() {
+  soundEnabled = !soundEnabled;
+  const btn = $('audioBtn');
+  btn.classList.toggle('on', soundEnabled);
+  btn.textContent = soundEnabled ? '🔊 الصوت يعمل (اضغط للكتم)' : '🔇 اضغط لتفعيل الصوت';
+  if (soundEnabled) sfx('bg'); else if (sounds.bg) sounds.bg.pause();
+}
+
+/* =====================================================
+   الإشعارات (طابور حتى لا تتداخل النوافذ)
+   ===================================================== */
+const notifyQueue = [];
+let notifyBusy = false;
+function notify(msg, delay = 400, title = '') {
+  notifyQueue.push({ msg, delay, title });
+  if (!notifyBusy) runNotifyQueue();
+}
+const notice = msg => notify(msg, 0);
+function runNotifyQueue() {
+  const next = notifyQueue.shift();
+  if (!next) { notifyBusy = false; return; }
+  notifyBusy = true;
+  setTimeout(() => {
+    $('noticeTitle').textContent = next.title;
+    $('noticeTitle').hidden = !next.title;
+    $('noticeText').textContent = next.msg;
+    openModal('noticeModal');
+  }, next.delay);
+}
+
+let bannerTimer;
+function banner(title, sub = '') {
+  const b = $('banner');
+  $('bannerTitle').textContent = title;
+  $('bannerSub').textContent = sub;
+  b.classList.remove('show');
+  void b.offsetWidth;
+  b.classList.add('show');
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => b.classList.remove('show'), 3400);
+}
+let toastTimer;
+function toast(text) {
+  const el = $('toast');
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+function fireConfetti(opts) { if (typeof confetti === 'function') confetti(opts); }
+
+/* =====================================================
+   التراجع (Undo)
+   ===================================================== */
+const undoStack = [];
+function snapshot(label) {
+  undoStack.push({ label, snap: clone(data) });
+  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  renderUndoButton();
+}
+function renderUndoButton() {
+  const btn = $('undoBtn');
+  const last = undoStack[undoStack.length - 1];
+  btn.disabled = !last;
+  btn.title = last ? `تراجع عن: ${last.label}` : 'لا يوجد ما يمكن التراجع عنه';
+  btn.textContent = last ? `↩️ تراجع (${undoStack.length})` : '↩️ تراجع';
+}
+function undo() {
+  const last = undoStack.pop();
+  if (!last) return;
+  if (!confirm(`هل تريد التراجع عن: "${last.label}" ؟`)) { undoStack.push(last); return; }
+  data = last.snap;
+  save();
+  renderUndoButton();
+}
+
+/* =====================================================
+   الحفظ
+   ===================================================== */
+let autoSaveTimer;
+function persist() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); return true; }
+  catch (e) { console.warn('save failed', e); return false; }
+}
+function autoSaveBackup() {
+  try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({ data, savedAt: Date.now() })); toast('💾 تم الحفظ تلقائياً'); } catch (e) {}
+}
+function save() {
+  persist();
+  renderAll();
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(autoSaveBackup, 1500);
+}
+
+/* =====================================================
+   منطق اللعبة
+   ===================================================== */
+function updateGlobalLevel() {
+  data.globalLevel = Object.values(data.attributes).reduce((s, a) => s + a.level, 0);
+}
+
+function addToLog(action, reward, type = 'normal', note = '') {
+  const now = new Date();
+  const time = `${now.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })} - ${now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+  const id = newId();
+  data.activityLog.unshift({ id, action, reward, time, type, note });
+  if (data.activityLog.length > 100) data.activityLog.length = 100;
+  return id;
+}
+
+function randomFrom(list, fallback) {
+  return list.length ? list[Math.floor(Math.random() * list.length)].name : fallback;
+}
+
+/** يضيف نقاطاً لصفة ويرقّيها (حتى لو تجاوزت النقاط أكثر من مستوى) */
+function gainPoints(key, pts) {
+  const attr = data.attributes[key];
+  if (!attr) return;
+  attr.points += pts;
+  while (attr.points >= attr.required) {
+    attr.points -= attr.required;
+    attr.level++;
+    data.health = Math.min(MAX_HP, data.health + LEVEL_HEAL);
+    addToLog(`🏆 ترقية ${attr.name}`, `المستوى ${attr.level} | +${LEVEL_HEAL} صحة`, 'achievement', `وصلت للمستوى ${attr.level} في ${attr.name}`);
+    sfx('reward');
+    fireConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#c5a059', '#e8c37b', '#ffffff', '#8a1a1a'] });
+    const reward = randomFrom(data.rewards, 'لا توجد مكافآت مضافة حالياً!');
+    banner('LEVEL UP', `${attr.name} — المستوى ${attr.level}`);
+    notify(`ارتفع مستوى "${attr.name}" إلى ${attr.level}.\n\n🎁 مكافأتك العشوائية:\n${reward}\n\n❤️ استعدت ${LEVEL_HEAL} نقطة صحة!`, 2600, 'GRACE DISCOVERED');
+  }
+}
+
+/** صحة إضافية؛ الفائض فوق الحد الأقصى يتحول لنقاط في أضعف صفة */
+function healWithOverflow(amount) {
+  const overflow = Math.max(0, data.health + amount - MAX_HP);
+  data.health = Math.min(MAX_HP, data.health + amount);
+  if (overflow <= 0) return;
+  const [weakKey] = Object.entries(data.attributes).sort((a, b) => a[1].points - b[1].points)[0];
+  addToLog('💎 فائض صحة تحول لنقاط', `+${overflow} ${data.attributes[weakKey].name}`, 'normal');
+  gainPoints(weakKey, overflow);
+}
+
+function checkDeath() {
+  if (data.health > 0) return;
+  data.health = 0;
+  const punishment = randomFrom(data.punishments, 'لا توجد عقوبات مضافة حالياً.');
+  sfx('death');
+  addToLog('💀 لقد مت!', punishment, 'bad', 'وصلت صحتك إلى 0');
+  $('punishmentText').textContent = punishment;
+  $('deathModal').classList.add('open');
+}
+
+function revive() {
+  $('deathModal').classList.remove('open');
+  snapshot('استعادة بعد الموت');
+  data.health = MAX_HP;
+  save();
+}
+
+/* ---------- الرونات والسجل اليومي ---------- */
+function todayHist() {
+  const k = localDateKey(new Date());
+  return data.history[k] || (data.history[k] = { acts: 0, full: false, runes: 0 });
+}
+function earnRunes(n) {
+  if (!(n > 0)) return;
+  data.runes += n;
+  data.lifetimeRunes = (data.lifetimeRunes || 0) + n;
+  todayHist().runes += n;
+}
+function noteActivity() { todayHist().acts++; }
+
+/* ---------- يوم جديد وسلسلة الالتزام ---------- */
+function checkNewDay() {
+  const today = dayKey();
+  if (data.lastPlayedDate === today) return;
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  // آخر يوم أُنجزت فيه كل المهام (وليس آخر يوم فُتح فيه التطبيق)
+  const lastDone = data.lastStreakDate || data.lastPlayedDate;
+  let intro = '';
+  if (data.streak > 0 && lastDone !== dayKey(yesterday) && lastDone !== today) {
+    const startToday = new Date();
+    startToday.setHours(0, 0, 0, 0);
+    let missed = Math.round((startToday - new Date(lastDone)) / 864e5) - 1;
+    if (!(missed >= 1)) missed = 1;
+    if (data.shields >= missed) {
+      // درع الراحة يغطي الأيام الفائتة ويحافظ على السلسلة
+      data.shields -= missed;
+      for (let i = 1; i <= missed; i++) {
+        const d = new Date(startToday);
+        d.setDate(d.getDate() - i);
+        const key = localDateKey(d);
+        const h = data.history[key] || (data.history[key] = { acts: 0, full: false, runes: 0 });
+        h.shield = true;
+      }
+      data.lastStreakDate = dayKey(yesterday);
+      addToLog('🛡️ درع الراحة', `حمى السلسلة (${missed} ${missed === 1 ? 'يوم' : 'أيام'})`, 'achievement', `استُهلك ${missed} من دروع الراحة للحفاظ على سلسلة ${data.streak} يوماً`);
+      banner('SHIELD USED', 'درع الراحة حمى سلسلتك');
+      intro = `🛡️ حمى الدرع سلسلتك من ${missed === 1 ? 'يوم فائت' : missed + ' أيام فائتة'}.\n\n`;
+    } else {
+      data.streak = 0;
+      data.health = Math.max(0, data.health - 50);
+      addToLog('💔 انكسار السلسلة', '-50 صحة', 'bad', 'فقدت السلسلة بسبب عدم إنجاز المهام');
+      notify('انكسرت سلسلتك ونقصت صحتك بـ 50 بسبب عدم إنجاز المهام.', 1200, 'CHAIN BROKEN');
+    }
+  }
+  data.lastPlayedDate = today;
+  data.completedDailyQuests = [];
+  notify(`${intro}🔥 السلسلة: ${data.streak} يوم\n☀ مهام اليوم: ${data.dailyQuests.length}\n🛡️ دروع الراحة: ${data.shields}\n💠 الرونات: ${data.runes}`, 800, 'A NEW DAY');
+  checkDeath();
+}
+
+function completeDailyQuest(id) {
+  if (data.completedDailyQuests.some(q => sameId(q, id))) return;
+  const quest = data.dailyQuests.find(q => sameId(q.id, id));
+  if (!quest) return;
+
+  snapshot(`إكمال مهمة: ${quest.text}`);
+  const rewards = [];
+  let runesEarned = 0;
+  quest.attrs.forEach((key, i) => {
+    const attr = data.attributes[key];
+    if (!attr) return;
+    rewards.push(`+${quest.points[i]} ${attr.name}`);
+    gainPoints(key, quest.points[i]);
+    runesEarned += quest.points[i];
+  });
+  earnRunes(runesEarned);
+  noteActivity();
+  rewards.push(`+${runesEarned} رونة`);
+  addToLog(`☀ مهمة يومية: ${quest.text}`, rewards.join(' | '), 'quest');
+  data.completedDailyQuests.push(quest.id);
+  autoProgressWeekly(quest.text);
+  fireConfetti({ particleCount: 80, spread: 80, origin: { y: 0.6 }, colors: ['#c5a059', '#e8c37b'] });
+
+  const allDone = data.dailyQuests.length > 0 && data.dailyQuests.every(q => data.completedDailyQuests.some(c => sameId(c, q.id)));
+  if (allDone && !todayHist().full) {
+    todayHist().full = true;
+    earnRunes(ALL_DONE_BONUS);
+    addToLog('🌅 يوم كامل', `+${ALL_DONE_BONUS} رونة`, 'achievement', 'أنجزت كل المهام اليومية');
+    banner('DAY COMPLETE', `+${ALL_DONE_BONUS} رونة مكافأة`);
+  }
+  const today = dayKey();
+  if (allDone && data.lastStreakDate !== today) {
+    data.streak++;
+    data.lastStreakDate = today;
+    data.bestStreak = Math.max(data.bestStreak || 0, data.streak);
+    if (data.streak % 14 === 0 && data.shields < MAX_SHIELDS) {
+      data.shields++;
+      addToLog('🛡️ درع راحة جديد', `سلسلة ${data.streak} يوماً`, 'achievement', 'حصلت على درع راحة مجاني');
+      notify('كوفئت على التزامك بدرع راحة جديد يحمي سلسلتك من يوم فائت.', 2600, 'SHIELD FORGED');
+    }
+    if (data.streak % 7 === 0) {
+      healWithOverflow(200);
+      earnRunes(STREAK7_RUNES);
+      addToLog('🔥 سلسلة 7 أيام', `+200 صحة | +${STREAK7_RUNES} رونة`, 'achievement', 'أكملت المهام اليومية 7 أيام متتالية');
+      sfx('reward');
+      fireConfetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, colors: ['#ff5722', '#ff7043', '#c5a059', '#ffffff'] });
+      banner('SEVEN DAYS UNBROKEN', 'سلسلة التزام لأسبوع كامل');
+      notify(`حصلت على +200 نقطة صحة و+${STREAK7_RUNES} رونة.\nصحتك الآن: ${data.health}`, 2600, 'REWARD');
+    }
+  }
+  save();
+}
+
+/* ---------- التحدي الأسبوعي ---------- */
+function initWeeklyChallenge() {
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - (now.getDay() + 1) % 7);   // الأسبوع يبدأ يوم السبت
+  const weekKey = localDateKey(weekStart);
+  if (data.weeklyChallenge && data.weeklyChallenge.weekKey === weekKey) return;
+  const c = WEEKLY_POOL[Math.floor(Math.random() * WEEKLY_POOL.length)];
+  data.weeklyChallenge = { weekKey, id: c.id, name: c.name, target: c.target, progress: 0, completed: false };
+}
+
+function progressWeekly(amount) {
+  const c = data.weeklyChallenge;
+  if (!c || c.completed || !(amount > 0)) return;
+  c.progress = Math.min(c.target, c.progress + amount);
+  if (c.progress < c.target) return;
+  c.completed = true;
+  healWithOverflow(200);
+  earnRunes(WEEKLY_RUNES);
+  addToLog('🏆 إكمال التحدي الأسبوعي', `+200 صحة | +${WEEKLY_RUNES} رونة`, 'achievement', `أكملت التحدي: ${c.name}`);
+  sfx('reward');
+  fireConfetti({ particleCount: 300, spread: 120, origin: { y: 0.5 }, colors: ['#9C27B0', '#E1BEE7', '#ffffff'] });
+  banner('ENEMY FELLED', c.name);
+  notify(`أكملت التحدي الأسبوعي وحصلت على +200 نقطة صحة و+${WEEKLY_RUNES} رونة.\nصحتك الآن: ${data.health}`, 2600, 'GREAT REWARD');
+}
+
+/** يزيد التقدم تلقائياً إذا كان اسم الفعل يطابق نوع التحدي (تمرين / تأمل) */
+function autoProgressWeekly(text) {
+  const c = data.weeklyChallenge;
+  if (!c) return;
+  const def = WEEKLY_POOL.find(p => p.id === c.id);
+  if (def && def.keywords.some(k => text.includes(k))) progressWeekly(1);
+}
+
+function weeklyAddManual() {
+  const c = data.weeklyChallenge;
+  if (!c || c.completed) return;
+  const unit = c.id === 'read_100' ? 'عدد الصفحات' : 'مقدار التقدم';
+  const val = parseInt(prompt(`${unit} الذي تريد تسجيله:`, c.id === 'read_100' ? '10' : '1'), 10);
+  if (!(val > 0)) return;
+  snapshot('تقدم في التحدي الأسبوعي');
+  progressWeekly(val);
+  save();
+}
+
+/* ---------- الأفعال الإيجابية والسيئة ---------- */
+function applyGood(id) {
+  const action = data.goodActions.find(a => sameId(a.id, id));
+  const slider = document.querySelector(`.tier-slider[data-kind="good"][data-id="${id}"]`);
+  if (!action || !slider) return;
+  const t = tier(slider.value);
+
+  snapshot(`تنفيذ الفعل: ${action.name}`);
+  const parts = [];
+  let runes = 0;
+  action.attrRewards.forEach(r => {
+    const attr = data.attributes[r.attr];
+    if (!attr) return;
+    const pts = Math.round(r.basePts * t.mult);
+    parts.push(`+${pts} ${attr.name}`);
+    gainPoints(r.attr, pts);
+    runes += pts;
+  });
+  earnRunes(runes);
+  noteActivity();
+  parts.push(`+${runes} رونة`);
+  autoProgressWeekly(action.name);
+  sfx('reward');
+  const logId = addToLog(`${action.name} (${t.label} - ${slider.value}%)`, parts.join(' | '), 'normal');
+  save();
+  openNoteModal(logId);
+}
+
+function applyBad(id) {
+  const action = data.badActions.find(a => sameId(a.id, id));
+  const slider = document.querySelector(`.tier-slider[data-kind="bad"][data-id="${id}"]`);
+  if (!action || !slider) return;
+  const t = tier(slider.value);
+  const loss = Math.round(action.baseLoss * t.mult);
+
+  snapshot(`تنفيذ الفعل السيئ: ${action.name}`);
+  data.health -= loss;
+  sfx('death');
+  addToLog(`☠ ${action.name} (${t.label} - ${slider.value}%)`, `-${loss} HP`, 'bad');
+  checkDeath();
+  save();
+}
+
+/* =====================================================
+   الواجهة
+   ===================================================== */
+function attrOptions(withNone) {
+  return (withNone ? '<option value="none">-- بدون --</option>' : '') +
+    Object.entries(ATTR_NAMES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+}
+
+function questRewardText(q) {
+  return q.attrs.map((a, i) => `${data.attributes[a] ? data.attributes[a].name : a} +${q.points[i]}`).join(' | ');
+}
+
+function renderHome() {
+  updateGlobalLevel();
+  $('healthVal').textContent = data.health;
+  $('healthBar').style.width = `${(data.health / MAX_HP) * 100}%`;
+  $('globalLevel').textContent = data.globalLevel;
+  $('streakVal').textContent = data.streak;
+  $('runesVal').textContent = data.runes;
+  $('shieldLine').textContent = `🛡️ × ${data.shields}`;
+  $('questDate').textContent = data.lastPlayedDate;
+
+  // التحدي الأسبوعي
+  const c = data.weeklyChallenge;
+  if (c) {
+    $('weeklyDesc').textContent = c.name;
+    $('weeklyDesc').classList.toggle('done', c.completed);
+    $('weeklyProgress').textContent = c.completed ? '✅ مكتمل!' : `التقدم: ${c.progress} / ${c.target}`;
+    $('weeklyFill').style.width = `${(c.progress / c.target) * 100}%`;
+    $('weeklyBtn').hidden = c.completed;
+  }
+
+  $('dailyQuestsList').innerHTML = data.dailyQuests.length
+    ? data.dailyQuests.map(q => {
+        const done = data.completedDailyQuests.some(c => sameId(c, q.id));
+        return `<div class="quest-item ${done ? 'completed' : ''}">
+          <div class="quest-main"><span class="grace-mark"></span><div><div class="quest-text">${esc(q.text)}</div><div class="quest-reward">المكافأة: ${esc(questRewardText(q))}</div></div></div>
+          <button class="btn" data-act="complete-quest" data-id="${q.id}" ${done ? 'disabled' : ''}>${done ? '✅ مكتملة' : 'إنجاز'}</button>
+        </div>`;
+      }).join('')
+    : '<div class="empty">لا توجد مهام يومية. أضف واحدة من صفحة «العهد».</div>';
+
+  $('attributesGrid').innerHTML = Object.values(data.attributes).map(a => `
+    <div class="attr-card">
+      <div class="attr-icon"><span>${a.icon}</span></div>
+      <div class="attr-name">${esc(a.name)}</div>
+      <div class="attr-level"><b>${a.level}</b><span>${a.points} / ${a.required}</span></div>
+      <div class="attr-bar"><div class="attr-fill" style="width:${Math.min(100, (a.points / a.required) * 100)}%"></div></div>
+    </div>`).join('');
+}
+
+function tiersPanel(kind, id, applyLabel, applyClass) {
+  return `<div class="tiers" id="tiers-${kind}-${id}">
+    <div class="slider-labels"><span class="easy">سهل (÷2)</span><span class="normal">عادي (×1)</span><span class="hard">صعب (×2)</span></div>
+    <input type="range" class="tier-slider" min="0" max="100" value="50" data-kind="${kind}" data-id="${id}" aria-label="الشدة">
+    <div class="slider-value"><span class="val-text" id="val-${kind}-${id}">الشدة: 50% (عادي)</span><span class="rew-text" id="rew-${kind}-${id}">${kind === 'good' ? 'ستُضرب النقاط × 1' : 'سيُخصم × 1 من الصحة'}</span></div>
+    <button class="btn-apply ${applyClass}" data-act="apply-${kind}" data-id="${id}">${applyLabel}</button>
+  </div>`;
+}
+
+function renderActions() {
+  const good = data.goodActions.filter(a =>
+    (!currentSearch || a.name.toLowerCase().includes(currentSearch)) &&
+    (currentFilter === 'all' || a.attrRewards.some(r => r.attr === currentFilter)));
+
+  $('goodActionsList').innerHTML = good.length ? good.map(a => {
+    const attrs = a.attrRewards.map(r => `${data.attributes[r.attr] ? data.attributes[r.attr].name : r.attr}: ${r.basePts}`).join(' | ');
+    return `<div class="action-item">
+      <div class="action-header">
+        <div class="action-name">${esc(a.name)} <small>(${esc(attrs)})</small></div>
+        <div class="action-controls">
+          <button class="btn btn-sm btn-green" data-act="edit-good" data-id="${a.id}">✏️ تعديل</button>
+          <button class="btn btn-sm" data-act="toggle-tiers" data-kind="good" data-id="${a.id}">إتمام الفعل <span class="arrow">▼</span></button>
+          <button class="btn-del" data-act="del-good" data-id="${a.id}" aria-label="حذف">×</button>
+        </div>
+      </div>${tiersPanel('good', a.id, 'تأكيد النقاط', '')}
+    </div>`;
+  }).join('') : '<div class="empty">لا توجد أفعال مطابقة للبحث.</div>';
+
+  $('badActionsList').innerHTML = data.badActions.map(a => `
+    <div class="action-item bad">
+      <div class="action-header">
+        <div class="action-name">${esc(a.name)} <small>(عادي: -${a.baseLoss} HP)</small></div>
+        <div class="action-controls">
+          <button class="btn btn-sm btn-orange" data-act="edit-bad" data-id="${a.id}">✏️ تعديل</button>
+          <button class="btn btn-sm btn-red" data-act="toggle-tiers" data-kind="bad" data-id="${a.id}">للأسف فعلتها <span class="arrow">▼</span></button>
+          <button class="btn-del" data-act="del-bad" data-id="${a.id}" aria-label="حذف">×</button>
+        </div>
+      </div>${tiersPanel('bad', a.id, 'تأكيد العقوبة', 'bad')}
+    </div>`).join('');
+}
+
+function renderFilterTabs() {
+  $('filterTabs').innerHTML =
+    `<button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-act="filter" data-key="all">الكل</button>` +
+    Object.entries(ATTR_NAMES).map(([k, v]) =>
+      `<button class="filter-btn ${currentFilter === k ? 'active' : ''}" data-act="filter" data-key="${k}">${v}</button>`).join('');
+}
+
+function simpleRow(cls, name, sub, delAct, id) {
+  return `<div class="action-item ${cls}"><div class="action-header">
+    <div><div class="action-name">${esc(name)}</div>${sub ? `<div style="font-size:13px;color:var(--green);margin-top:5px">${esc(sub)}</div>` : ''}</div>
+    <button class="btn-del" data-act="${delAct}" data-id="${id}" aria-label="حذف">×</button></div></div>`;
+}
+
+function renderSettings() {
+  $('dailyQuestsManageList').innerHTML = data.dailyQuests.length
+    ? data.dailyQuests.map(q => simpleRow('simple', q.text, questRewardText(q), 'del-quest', q.id)).join('')
+    : '<div class="empty">لا توجد مهام يومية. أضف واحدة أدناه.</div>';
+  $('rewardsList').innerHTML = data.rewards.map(r => `
+    <div class="action-item reward"><div class="action-header">
+      <div class="action-name">${esc(r.name)} <small>(${r.cost} رونة)</small></div>
+      <div class="action-controls">
+        <button class="btn btn-sm" data-act="edit-reward-cost" data-id="${r.id}">✏️ السعر</button>
+        <button class="btn-del" data-act="del-reward" data-id="${r.id}" aria-label="حذف">×</button>
+      </div></div></div>`).join('');
+  $('punishmentsList').innerHTML = data.punishments.map(p => simpleRow('bad', p.name, '', 'del-punishment', p.id)).join('');
+}
+
+function renderLog() {
+  $('activityLogList').innerHTML = data.activityLog.length ? data.activityLog.map(l => `
+    <div class="log-item ${l.type === 'normal' ? '' : esc(l.type)}">
+      <div class="log-header">
+        <div><div class="log-action">${esc(l.action)}</div><div class="log-reward">${esc(l.reward)}</div></div>
+        <div class="log-time">${esc(l.time)}</div>
+      </div>
+      ${l.note ? `<div class="log-note">📝 ${esc(l.note)}</div>` : ''}
+      <div class="log-actions">
+        <button class="btn-log edit" data-act="open-note" data-id="${l.id}">✏️ ملاحظة</button>
+        <button class="btn-log delete" data-act="del-log" data-id="${l.id}">🗑️ حذف</button>
+      </div>
+    </div>`).join('') : '<div class="empty">السجل فارغ. أنجز مهمة لتبدأ رحلتك.</div>';
+}
+
+function renderRadar() {
+  const canvas = $('radarChart');
+  if (typeof Chart === 'undefined') return;
+  const labels = Object.values(data.attributes).map(a => a.name);
+  const values = Object.values(data.attributes).map(a => a.points);
+  if (radarChart) {
+    radarChart.data.labels = labels;
+    radarChart.data.datasets[0].data = values;
+    radarChart.update();
+    return;
+  }
+  radarChart = new Chart(canvas.getContext('2d'), {
+    type: 'radar',
+    data: { labels, datasets: [{
+      label: 'نقاط الصفة (من 1000)', data: values,
+      backgroundColor: 'rgba(197,160,89,.2)', borderColor: 'rgba(197,160,89,1)', borderWidth: 2,
+      pointBackgroundColor: 'rgba(197,160,89,1)', pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff', pointHoverBorderColor: 'rgba(197,160,89,1)'
+    }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { r: {
+        min: 0, max: 1000,
+        angleLines: { color: 'rgba(255,255,255,.1)' }, grid: { color: 'rgba(255,255,255,.1)' },
+        pointLabels: { color: '#d1d1d1', font: { family: 'Amiri', size: 14, weight: 'bold' } },
+        ticks: { display: false, stepSize: 200 }
+      } },
+      plugins: { legend: { labels: { color: '#d1d1d1', font: { family: 'Amiri', size: 16 } } } }
+    }
+  });
+}
+
+function renderAll() {
+  renderHome();
+  renderHeatmap();
+  renderShop();
+  renderActions();
+  renderSettings();
+  renderLog();
+  if ($('page5').classList.contains('active')) renderRadar();
+}
+
+function switchPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === String(n)));
+  $(`page${n}`).classList.add('active');
+  if (n === 5) renderRadar();
+}
+
+/* ---------- النوافذ ---------- */
+const openModal = id => $(id).classList.add('open');
+const closeModal = id => $(id).classList.remove('open');
+
+function openNoteModal(logId = null) {
+  const log = logId != null ? data.activityLog.find(l => sameId(l.id, logId)) : null;
+  $('noteLogId').value = log ? log.id : '';
+  $('noteInput').value = log ? (log.note || '') : '';
+  $('noteModalTitle').textContent = log ? 'تعديل الملاحظة' : 'إضافة ملاحظة يدوية';
+  openModal('noteModal');
+  $('noteInput').focus();
+}
+
+function saveNote() {
+  const text = $('noteInput').value.trim();
+  const logId = $('noteLogId').value;
+  snapshot(logId ? 'تعديل ملاحظة' : 'إضافة ملاحظة يدوية');
+  if (logId) {
+    const log = data.activityLog.find(l => sameId(l.id, logId));
+    if (log) log.note = text;
+  } else {
+    if (!text) { undoStack.pop(); renderUndoButton(); return closeModal('noteModal'); }
+    addToLog('📝 ملاحظة حرة', 'بدون نقاط', 'normal', text);
+  }
+  closeModal('noteModal');
+  save();
+}
+
+function saveAchievement() {
+  const name = $('achName').value.trim();
+  const details = $('achDetails').value.trim();
+  if (!name) return notice('يرجى كتابة اسم الإنجاز');
+  snapshot(`إضافة إنجاز: ${name}`);
+  pendingAchievement = { name, details };
+  addToLog(`🏆 ${name}`, details || 'إنجاز جديد', 'achievement');
+  closeModal('achievementModal');
+  save();
+  $('achievementRewardName').textContent = name;
+  openModal('achievementRewardModal');
+}
+
+function grantAchievement(granted) {
+  closeModal('achievementRewardModal');
+  if (granted && pendingAchievement) {
+    snapshot(`مكافأة إنجاز: ${pendingAchievement.name}`);
+    const gained = Math.min(MAX_HP, data.health + 100) - data.health;
+    data.health += gained;
+    if (gained > 0) {
+      addToLog('🎁 مكافأة إنجاز', `+${gained} صحة`, 'achievement', `حصلت على مكافأة إنجاز: ${pendingAchievement.name}`);
+      sfx('reward');
+      fireConfetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#9C27B0', '#E1BEE7', '#c5a059', '#ffffff'] });
+      banner('ACHIEVED', pendingAchievement.name);
+      notify(`تمت إضافة +${gained} نقطة صحة.\nصحتك الآن: ${data.health}`, 1800, 'REWARD');
+    } else {
+      notify(`❤️ صحتك ممتلئة بالفعل (${MAX_HP})!`, 300);
+    }
+    save();
+  }
+  pendingAchievement = null;
+}
+
+/* ---------- تعديل الأفعال ---------- */
+function editRowHtml(attr, pts) {
+  return `<div class="attr-input-row">
+    <select class="form-control edit-attr">${Object.entries(ATTR_NAMES).map(([k, v]) => `<option value="${k}" ${k === attr ? 'selected' : ''}>${v}</option>`).join('')}</select>
+    <input type="number" class="form-control edit-pts" value="${pts}" min="1">
+    <button class="btn-del" data-act="edit-remove-row" aria-label="حذف الصفة">🗑️</button>
+  </div>`;
+}
+
+function openEditGood(id) {
+  const a = data.goodActions.find(x => sameId(x.id, id));
+  if (!a) return;
+  $('editGoodId').value = a.id;
+  $('editGoodTitle').textContent = `تعديل نقاط: ${a.name}`;
+  $('editAttrsContainer').innerHTML = a.attrRewards.map(r => editRowHtml(r.attr, r.basePts)).join('');
+  openModal('editGoodModal');
+}
+
+function saveEditGood() {
+  const a = data.goodActions.find(x => sameId(x.id, $('editGoodId').value));
+  if (!a) return;
+  const rewards = [...document.querySelectorAll('#editAttrsContainer .attr-input-row')]
+    .map(row => ({ attr: row.querySelector('.edit-attr').value, basePts: parseInt(row.querySelector('.edit-pts').value, 10) }))
+    .filter(r => r.attr && r.basePts > 0);
+  if (!rewards.length) return notice('يجب أن يمتلك الفعل صفة واحدة على الأقل بنقاط صحيحة.');
+  snapshot(`تعديل الفعل: ${a.name}`);
+  a.attrRewards = rewards;
+  closeModal('editGoodModal');
+  save();
+}
+
+function openEditBad(id) {
+  const a = data.badActions.find(x => sameId(x.id, id));
+  if (!a) return;
+  $('editBadId').value = a.id;
+  $('editBadTitle').textContent = `تعديل: ${a.name}`;
+  $('editBadLoss').value = a.baseLoss;
+  openModal('editBadModal');
+}
+
+function saveEditBad() {
+  const a = data.badActions.find(x => sameId(x.id, $('editBadId').value));
+  const loss = parseInt($('editBadLoss').value, 10);
+  if (!a) return;
+  if (!(loss > 0)) return notice('أدخل مقداراً صحيحاً');
+  snapshot(`تعديل الفعل السيئ: ${a.name}`);
+  a.baseLoss = loss;
+  closeModal('editBadModal');
+  save();
+}
+
+/* ---------- الإضافة والحذف ---------- */
+function addNewAction() {
+  const name = $('newActionName').value.trim();
+  if (!name) return notice('يرجى كتابة اسم الفعل');
+
+  if ($('actionType').value === 'good') {
+    const rewards = [1, 2, 3]
+      .map(i => ({ attr: $(`goodAttr${i}`).value, basePts: parseInt($(`goodPts${i}`).value, 10) || 0 }))
+      .filter(r => r.attr !== 'none' && r.basePts > 0);
+    if (!rewards.length) return notice('أضف صفة واحدة على الأقل بنقاط صحيحة');
+    snapshot('إضافة فعل جديد');
+    data.goodActions.push({ id: newId(), name, attrRewards: rewards });
+  } else {
+    const loss = parseInt($('badHealthLoss').value, 10);
+    if (!(loss > 0)) return notice('أدخل مقدار خصم صحيح');
+    snapshot('إضافة فعل جديد');
+    data.badActions.push({ id: newId(), name, baseLoss: loss });
+  }
+  $('newActionName').value = '';
+  save();
+  toast('✅ تمت إضافة الفعل');
+}
+
+function addQuest() {
+  const text = $('newQuestText').value.trim();
+  if (!text) return notice('يرجى كتابة نص المهمة');
+  const attrs = [$('newQuestAttr1').value], points = [parseInt($('newQuestPts1').value, 10) || 50];
+  const a2 = $('newQuestAttr2').value, p2 = parseInt($('newQuestPts2').value, 10) || 0;
+  if (a2 !== 'none' && p2 > 0 && a2 !== attrs[0]) { attrs.push(a2); points.push(p2); }
+  snapshot(`إضافة مهمة يومية: ${text}`);
+  data.dailyQuests.push({ id: newId(), text, attrs, points });
+  $('newQuestText').value = '';
+  save();
+  toast('✅ تمت إضافة المهمة اليومية');
+}
+
+function addSimple(listKey, inputId, label) {
+  const name = $(inputId).value.trim();
+  if (!name) return notice(`يرجى كتابة ${label}`);
+  snapshot(`إضافة ${label}`);
+  data[listKey].push({ id: newId(), name });
+  $(inputId).value = '';
+  save();
+  toast(`✅ تمت إضافة ${label}`);
+}
+
+function removeFrom(listKey, id, label, confirmText) {
+  if (!confirm(confirmText)) return;
+  snapshot(`حذف ${label}`);
+  data[listKey] = data[listKey].filter(x => !sameId(x.id, id));
+  if (listKey === 'dailyQuests') data.completedDailyQuests = data.completedDailyQuests.filter(q => !sameId(q, id));
+  save();
+}
+
+/* ---------- نسخ احتياطي ---------- */
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `elden_rpg_backup_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('📥 تم تصدير البيانات');
+}
+
+function importData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    let imported;
+    try { imported = JSON.parse(e.target.result); } catch (err) { return notice('خطأ في قراءة الملف. تأكد أنه ملف JSON صحيح.'); }
+    if (!imported || !imported.attributes || !imported.goodActions) return notice('خطأ: الملف غير صالح أو لا ينتمي لهذا التطبيق.');
+    if (!confirm('هل أنت متأكد؟ سيتم استبدال جميع بياناتك الحالية بالبيانات المستوردة.')) return;
+    snapshot('استيراد بيانات');
+    data = normalize(imported);
+    save();
+    toast('📤 تم استيراد البيانات');
+  };
+  reader.readAsText(file);
+}
+
+/* =====================================================
+   معالجة الأحداث (Event delegation)
+   ===================================================== */
+const actions = {
+  'toggle-audio': toggleAudio,
+  'undo': undo,
+  'page': el => switchPage(Number(el.dataset.page)),
+  'filter': el => { currentFilter = el.dataset.key; renderFilterTabs(); renderActions(); },
+  'complete-quest': el => completeDailyQuest(el.dataset.id),
+  'weekly-add': weeklyAddManual,
+
+  'toggle-tiers': el => {
+    const panel = $(`tiers-${el.dataset.kind}-${el.dataset.id}`);
+    const wasOpen = panel.classList.contains('show');
+    document.querySelectorAll('.tiers.show').forEach(p => p.classList.remove('show'));
+    document.querySelectorAll('[data-act="toggle-tiers"].active').forEach(b => b.classList.remove('active'));
+    if (!wasOpen) { panel.classList.add('show'); el.classList.add('active'); }
+  },
+  'apply-good': el => applyGood(el.dataset.id),
+  'apply-bad': el => applyBad(el.dataset.id),
+
+  'edit-good': el => openEditGood(el.dataset.id),
+  'edit-bad': el => openEditBad(el.dataset.id),
+  'edit-add-row': () => $('editAttrsContainer').insertAdjacentHTML('beforeend', editRowHtml('mind', 10)),
+  'edit-remove-row': el => el.closest('.attr-input-row').remove(),
+  'save-edit-good': saveEditGood,
+  'save-edit-bad': saveEditBad,
+
+  'del-good': el => removeFrom('goodActions', el.dataset.id, 'فعل', 'هل أنت متأكد من حذف هذا الفعل؟'),
+  'del-bad': el => removeFrom('badActions', el.dataset.id, 'فعل سيئ', 'هل أنت متأكد من حذف هذا الفعل السيئ؟'),
+  'del-quest': el => removeFrom('dailyQuests', el.dataset.id, 'مهمة يومية', 'حذف هذه المهمة اليومية؟'),
+  'del-reward': el => removeFrom('rewards', el.dataset.id, 'مكافأة', 'حذف هذه المكافأة؟'),
+  'del-punishment': el => removeFrom('punishments', el.dataset.id, 'عقوبة', 'حذف هذه العقوبة؟'),
+  'del-log': el => {
+    if (!confirm('هل تريد حذف هذا الحدث من السجل؟')) return;
+    snapshot('حذف حدث من السجل');
+    data.activityLog = data.activityLog.filter(l => !sameId(l.id, el.dataset.id));
+    save();
+  },
+
+  'add-action': addNewAction,
+  'add-quest': addQuest,
+  'add-reward': addReward,
+  'add-punishment': () => addSimple('punishments', 'newPunishmentName', 'العقوبة'),
+
+  'open-note': el => openNoteModal(el.dataset.id ?? null),
+  'save-note': saveNote,
+  'open-achievement': () => { $('achName').value = ''; $('achDetails').value = ''; openModal('achievementModal'); $('achName').focus(); },
+  'save-achievement': saveAchievement,
+  'grant-achievement': el => grantAchievement(el.dataset.grant === '1'),
+  'close-modal': el => closeModal(el.dataset.modal),
+  'revive': revive,
+  'close-notice': () => { closeModal('noticeModal'); runNotifyQueue(); },
+  'buy-reward': el => buyReward(el.dataset.id),
+  'buy-shield': buyShield,
+  'install': installApp,
+  'edit-reward-cost': el => {
+    const r = data.rewards.find(x => sameId(x.id, el.dataset.id));
+    if (!r) return;
+    const v = parseInt(prompt(`سعر «${r.name}» بالرونات:`, r.cost), 10);
+    if (!(v > 0)) return;
+    snapshot('تعديل سعر مكافأة');
+    r.cost = v;
+    save();
+  },
+
+  'export': exportData,
+  'import': () => $('importFile').click()
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (e.target.closest('button') && !e.target.closest('#audioBtn')) sfx('click');
+  if (!el) return;
+  const fn = actions[el.dataset.act];
+  if (fn) fn(el);
+});
+
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'searchInput') { currentSearch = t.value.toLowerCase(); renderActions(); return; }
+  if (t.classList.contains('tier-slider')) {
+    const { kind, id } = t.dataset;
+    const x = tier(t.value);
+    $(`val-${kind}-${id}`).textContent = `الشدة: ${t.value}% (${x.label})`;
+    $(`rew-${kind}-${id}`).textContent = kind === 'good' ? `ستُضرب النقاط × ${x.mult}` : `سيُخصم × ${x.mult} من الصحة`;
+  }
+});
+
+$('actionType').addEventListener('change', e => {
+  const good = e.target.value === 'good';
+  $('goodFields').hidden = !good;
+  $('badFields').hidden = good;
+});
+$('importFile').addEventListener('change', e => { importData(e.target.files[0]); e.target.value = ''; });
+
+document.addEventListener('keydown', e => {
+  const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey && !typing) { e.preventDefault(); undo(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+    e.preventDefault();
+    toast(persist() ? '💾 تم الحفظ يدوياً' : '⚠️ فشل الحفظ');
+    autoSaveBackup();
+  }
+  if (e.key === 'Escape') {
+    if ($('noticeModal').classList.contains('open')) actions['close-notice']();
+    else document.querySelectorAll('.modal.open:not(.death)').forEach(m => m.classList.remove('open'));
+  }
+});
+
+window.addEventListener('beforeunload', () => { persist(); autoSaveBackup(); });
+
+/* =====================================================
+   التشغيل
+   ===================================================== */
+/* =====================================================
+   المؤثرات البصرية: شجرة إردتري والجمر
+   ===================================================== */
+function drawErdtree(svg) {
+  if (!svg) return;
+  let seed = 11;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const paths = [], tips = [];
+  (function grow(x, y, ang, len, depth) {
+    const bend = (rnd() - 0.5) * 0.55;
+    const x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len;
+    const cx = x + Math.cos(ang + bend) * len * 0.55, cy = y + Math.sin(ang + bend) * len * 0.55;
+    const w = Math.max(0.45, 6.5 * Math.pow(0.64, depth));
+    paths.push(`<path d="M${x.toFixed(1)} ${y.toFixed(1)}Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}" stroke-width="${w.toFixed(2)}" opacity="${(1 - depth * 0.09).toFixed(2)}"/>`);
+    if (depth >= 6) { tips.push(`<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="${(1 + rnd() * 1.4).toFixed(1)}"/>`); return; }
+    const kids = depth < 2 ? 3 : (rnd() < 0.35 ? 3 : 2);
+    const spread = depth < 2 ? 0.8 : 0.58;
+    for (let i = 0; i < kids; i++) {
+      const a = ang + (i - (kids - 1) / 2) * spread + (rnd() - 0.5) * 0.25;
+      grow(x2, y2, a, len * (0.7 + rnd() * 0.06), depth + 1);
+    }
+  })(200, 170, -Math.PI / 2, 54, 0);
+
+  svg.innerHTML =
+    `<defs>
+      <radialGradient id="egl" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#f1d899" stop-opacity=".5"/><stop offset=".55" stop-color="#c8a45c" stop-opacity=".12"/><stop offset="1" stop-color="#c8a45c" stop-opacity="0"/></radialGradient>
+      <linearGradient id="etk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1d899"/><stop offset="1" stop-color="#6b4d17"/></linearGradient>
+    </defs>
+    <ellipse cx="200" cy="105" rx="200" ry="120" fill="url(#egl)"/>
+    <path d="M184 252C191 216 196 192 200 168C204 192 209 216 216 252Z" fill="url(#etk)"/>
+    <g fill="none" stroke="#e3c27a" stroke-linecap="round">${paths.join('')}</g>
+    <g fill="#fff3d1" opacity=".85">${tips.join('')}</g>`;
+}
+
+function startEmbers() {
+  const cv = $('embers');
+  if (!cv || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ctx = cv.getContext('2d');
+  let W = 0, H = 0;
+  const P = Array.from({ length: 46 }, () => ({}));
+  const reset = (p, initial) => {
+    p.x = Math.random() * W; p.y = initial ? Math.random() * H : H + 10;
+    p.r = 0.6 + Math.random() * 1.8; p.vy = 0.15 + Math.random() * 0.45;
+    p.vx = (Math.random() - 0.5) * 0.25; p.ph = Math.random() * 6.28; p.a = 0.25 + Math.random() * 0.6;
+  };
+  const size = () => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  size();
+  P.forEach(p => reset(p, true));
+  window.addEventListener('resize', size);
+  (function frame(t) {
+    if (!document.hidden) {
+      ctx.clearRect(0, 0, W, H);
+      for (const p of P) {
+        p.y -= p.vy;
+        p.x += p.vx + Math.sin(t / 1800 + p.ph) * 0.15;
+        if (p.y < -10) reset(p, false);
+        const tw = 0.55 + 0.45 * Math.sin(t / 700 + p.ph);
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(241,200,120,${p.a * tw})`;
+        ctx.shadowColor = 'rgba(241,200,120,.9)';
+        ctx.shadowBlur = 8;
+        ctx.arc(p.x, p.y, p.r, 0, 6.283);
+        ctx.fill();
+      }
+    }
+    requestAnimationFrame(frame);
+  })(0);
+}
+
+/* =====================================================
+   الرونات: المتجر، الدرع، وخريطة الالتزام
+   ===================================================== */
+function addReward() {
+  const name = $('newRewardName').value.trim();
+  const cost = parseInt($('newRewardCost').value, 10);
+  if (!name) return notice('يرجى كتابة المكافأة');
+  if (!(cost > 0)) return notice('أدخل سعراً صحيحاً بالرونات');
+  snapshot('إضافة مكافأة');
+  data.rewards.push({ id: newId(), name, cost });
+  $('newRewardName').value = '';
+  save();
+  toast('✅ تمت إضافة المكافأة');
+}
+
+function buyReward(id) {
+  const r = data.rewards.find(x => sameId(x.id, id));
+  if (!r) return;
+  if (data.runes < r.cost) return notice('رصيدك من الرونات لا يكفي بعد. أنجز مهامك وعد.');
+  if (!confirm(`شراء «${r.name}» مقابل ${r.cost} رونة؟`)) return;
+  snapshot(`شراء: ${r.name}`);
+  data.runes -= r.cost;
+  addToLog(`🛍️ ${r.name}`, `-${r.cost} رونة`, 'normal', 'استمتع بمكافأتك، فقد استحققتها.');
+  sfx('reward');
+  banner('ACQUIRED', r.name);
+  fireConfetti({ particleCount: 90, spread: 70, origin: { y: 0.7 }, colors: ['#c8a45c', '#f1d899', '#ffffff'] });
+  save();
+}
+
+function buyShield() {
+  if (data.shields >= MAX_SHIELDS) return notice(`لديك الحد الأقصى من الدروع (${MAX_SHIELDS}).`);
+  if (data.runes < SHIELD_PRICE) return notice('رصيدك من الرونات لا يكفي لشراء درع الراحة.');
+  if (!confirm(`شراء درع راحة مقابل ${SHIELD_PRICE} رونة؟`)) return;
+  snapshot('شراء درع راحة');
+  data.runes -= SHIELD_PRICE;
+  data.shields++;
+  addToLog('🛡️ درع راحة', `-${SHIELD_PRICE} رونة`, 'normal');
+  banner('SHIELD FORGED', 'سلسلتك محمية من يوم فائت');
+  save();
+}
+
+function renderShop() {
+  $('shopRunes').textContent = data.runes;
+  const canShield = data.shields < MAX_SHIELDS && data.runes >= SHIELD_PRICE;
+  $('shieldShop').innerHTML = `
+    <div class="action-item shield"><div class="action-header">
+      <div>
+        <div class="action-name">🛡️ درع الراحة <small>(تملك ${data.shields} / ${MAX_SHIELDS})</small></div>
+        <div class="hint" style="margin-top:4px">يحمي سلسلتك من يوم فائت واحد. تحصل على درع مجاني كل 14 يوماً متواصلاً.</div>
+      </div>
+      <div class="action-controls"><span class="cost">${SHIELD_PRICE} رونة</span>
+        <button class="btn btn-sm" data-act="buy-shield" ${canShield ? '' : 'disabled'}>اشترِ</button></div>
+    </div></div>`;
+  const list = [...data.rewards].sort((a, b) => a.cost - b.cost);
+  $('rewardShop').innerHTML = list.length ? list.map(r => `
+    <div class="action-item reward"><div class="action-header">
+      <div class="action-name">${esc(r.name)}</div>
+      <div class="action-controls"><span class="cost">${r.cost} رونة</span>
+        <button class="btn btn-sm" data-act="buy-reward" data-id="${r.id}" ${data.runes >= r.cost ? '' : 'disabled'}>اشترِ</button></div>
+    </div></div>`).join('') : '<div class="empty">لا توجد مكافآت. أضف واحدة من صفحة «العهد».</div>';
+}
+
+function histLevel(h) {
+  if (!h) return 0;
+  if (h.full) return 4;
+  if (h.acts >= 3) return 3;
+  if (h.acts >= 2) return 2;
+  return h.acts >= 1 ? 1 : 0;
+}
+
+function renderHeatmap() {
+  const WEEKS = 18;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dow = (today.getDay() + 1) % 7;                       // الأسبوع يبدأ يوم السبت
+  const start = new Date(today);
+  start.setDate(today.getDate() - dow - (WEEKS - 1) * 7);
+  let html = '';
+  for (let i = 0; i < WEEKS * 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    if (d > today) { html += '<i class="hm none"></i>'; continue; }
+    const h = data.history[localDateKey(d)];
+    const label = `${d.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })}: ` +
+      (h && h.shield ? 'محمي بدرع' : h ? `${h.acts} نشاط${h.full ? ' · يوم كامل' : ''}` : 'لا نشاط');
+    html += `<i class="hm l${histLevel(h)}${h && h.shield ? ' shield' : ''}${d.getTime() === today.getTime() ? ' today' : ''}" title="${label}"></i>`;
+  }
+  $('heatmap').innerHTML = html;
+  const days = Object.values(data.history);
+  $('heatStats').innerHTML =
+    `<span>أيام كاملة: <b>${days.filter(h => h.full).length}</b></span>` +
+    `<span>أيام نشطة: <b>${days.filter(h => h.acts > 0).length}</b></span>` +
+    `<span>أفضل سلسلة: <b>${data.bestStreak || 0}</b></span>`;
+}
+
+/* =====================================================
+   تثبيت التطبيق (PWA)
+   ===================================================== */
+let deferredInstall = null;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstall = e;
+  if (!isStandalone) $('installBtn').hidden = false;
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstall = null;
+  $('installBtn').hidden = true;
+  toast('✅ تم تثبيت التطبيق');
+});
+function installApp() {
+  if (isStandalone) return notice('التطبيق مثبّت ويعمل الآن بوضع التطبيق.');
+  if (deferredInstall) {
+    deferredInstall.prompt();
+    deferredInstall.userChoice.finally(() => { deferredInstall = null; $('installBtn').hidden = true; });
+    return;
+  }
+  notice('لتثبيت التطبيق:\n\n• أندرويد (Chrome): القائمة ⋮ ← «تثبيت التطبيق».\n• آيفون (Safari): زر المشاركة ← «إضافة إلى الشاشة الرئيسية».\n\nيلزم فتح التطبيق من رابط https وليس من ملف على الجهاز.');
+}
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+$('newQuestAttr1').innerHTML = attrOptions(false);
+$('newQuestAttr2').innerHTML = attrOptions(true);
+$('goodAttr1').innerHTML = attrOptions(false);
+$('goodAttr2').innerHTML = attrOptions(true);
+$('goodAttr3').innerHTML = attrOptions(true);
+$('goodAttr2').value = 'none'; $('goodAttr3').value = 'none';
+$('newQuestAttr2').value = 'none';
+
+drawErdtree($('erdtree'));
+startEmbers();
+renderFilterTabs();
+checkNewDay();
+initWeeklyChallenge();
+persist();
+renderAll();
+renderUndoButton();
+</script>
+</body>
+</html>
