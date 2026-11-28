@@ -335,6 +335,70 @@ body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px
 .cost{font-family:'Cinzel','Amiri',serif;color:var(--gold-glow);font-size:16px}
 .action-item.shield{border-right-color:var(--blue)}
 @media (max-width:600px){.nav-btn{font-size:13px;padding:0 2px}}
+
+/* ---------- v4: حساب السعرات ---------- */
+.food-box{position:relative;padding:26px;margin-bottom:34px;background:var(--panel);border:1px solid var(--border-color);box-shadow:var(--frame),0 12px 32px rgba(0,0,0,.5)}
+.food-box::before{content:"";position:absolute;top:-6px;left:50%;width:10px;height:10px;transform:translateX(-50%) rotate(45deg);background:#0a0806;border:1px solid var(--gold);box-shadow:0 0 10px rgba(241,216,153,.55)}
+.food-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.food-title{font-size:22px;color:var(--gold-glow)}
+.food-status{font-size:15px;color:var(--text-dim)}
+.food-status[data-state="over"]{color:#e5675a}
+.food-status[data-state="ok"]{color:#86c797}
+.food-meter{height:16px;background:#120f0a;border:1px solid #6b5326;box-shadow:inset 0 0 8px #000,0 0 0 2px #0a0806,0 0 0 3px rgba(200,164,92,.35);overflow:hidden}
+.food-fill{height:100%;width:0;background:linear-gradient(180deg,#9bd0a6,#4f9a62 55%,#2c5e3a);transition:width .5s}
+.food-fill.warn{background:linear-gradient(180deg,#f1d899,#c8a45c 55%,#7a5a1e)}
+.food-fill.over{background:linear-gradient(180deg,#e85a46,#a52020 55%,#5c0f0f)}
+.food-numbers{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0 16px;font-size:15px;color:#cfc4aa}
+.food-numbers b{font-family:'Cinzel',serif;font-size:22px;color:var(--gold-glow)}
+.food-add{display:flex;gap:10px;flex-wrap:wrap}
+.food-add input[type=text]{flex:2 1 160px;width:auto}
+.food-add input[type=number]{flex:1 1 100px;width:auto}
+.food-favs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:#0d0b08;border:1px solid #3d3520;color:var(--gold);padding:5px 12px;font-size:14px;cursor:pointer;border-radius:2px;transition:.2s}
+.chip:hover{border-color:var(--gold);color:var(--gold-glow)}
+.chip .x{background:none;border:none;color:#6f664f;font-size:17px;line-height:1;padding:0 2px;cursor:pointer}
+.chip .x:hover{color:var(--blood-glow)}
+.food-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;margin-top:8px;background:rgba(0,0,0,.4);border:1px solid rgba(200,164,92,.14);border-right:3px solid var(--green)}
+.food-row .kc{font-family:'Cinzel',serif;color:var(--gold-glow)}
+.food-row small{color:var(--text-dim);margin-right:8px}
+.food-row .row-btns{display:flex;align-items:center;gap:6px}
+.btn-star{background:none;border:none;color:#6f664f;font-size:18px;cursor:pointer;transition:.2s}
+.btn-star:hover{color:var(--gold-glow)}
+
+/* ---------- v5: الجيم ---------- */
+.gym-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:16px 18px;margin-bottom:16px;background:var(--panel);border:1px solid var(--border-color);box-shadow:var(--frame)}
+.gym-week{font-family:'Cinzel','Amiri',serif;font-size:22px;color:var(--gold-glow)}
+.gym-week small{font-size:14px;color:var(--text-dim);margin-right:6px}
+.gym-bar-btns{display:flex;gap:8px;flex-wrap:wrap}
+.gym-summary{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px;font-size:14px;color:var(--text-dim)}
+.gym-summary b{font-family:'Cinzel',serif;color:var(--gold-glow);font-size:17px}
+.gym-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.gym-tab{background:#0d0b08;color:var(--text-dim);border:1px solid #3d3520;padding:9px 18px;font-family:'Cinzel','Amiri',serif;font-size:16px;cursor:pointer;transition:.2s;border-radius:2px;flex:1 1 90px}
+.gym-tab:hover{color:var(--gold);border-color:var(--gold)}
+.gym-tab.active{background:var(--gold);color:#120d05;border-color:var(--gold);font-weight:700;box-shadow:0 0 12px rgba(200,164,92,.5)}
+.gym-tab.done::after{content:" ✅"}
+.gym-ex{padding:16px 18px;margin-bottom:12px;background:linear-gradient(to left,rgba(200,164,92,.06),rgba(12,10,8,.92) 55%);border:1px solid rgba(200,164,92,.16);border-right:3px solid var(--gold)}
+.gym-ex-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}
+.gym-ex-name{font-weight:700;font-size:18px;color:#f0e6cc;font-family:'Cinzel','Amiri',serif;direction:ltr;text-align:right}
+.gym-ex-target{font-size:13px;color:var(--text-dim);margin-top:2px}
+.gym-inputs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.gym-wbox{position:relative;flex:1 1 120px}
+.gym-wbox .form-control{padding-left:46px;font-size:20px;font-family:'Cinzel',serif;color:var(--gold-glow);text-align:center}
+.gym-unit{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-dim);pointer-events:none}
+.gym-inputs .gym-r{flex:2 1 150px;width:auto}
+.gym-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--text-dim);min-height:28px}
+.gym-meta b{color:var(--gold-glow);font-family:'Cinzel',serif}
+.gym-chg{display:inline-block;padding:1px 8px;margin-right:6px;font-family:'Cinzel',serif;font-size:12px;border:1px solid #3d3520}
+.gym-chg.up{color:#86c797;border-color:var(--green)}
+.gym-chg.down{color:#e5675a;border-color:var(--blood)}
+.gym-pr{color:var(--gold-glow);font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em}
+.spark{display:block;overflow:visible}
+.gym-actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 6px}
+.gym-actions .btn{flex:1 1 160px;margin-top:0}
+.body-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:12px}
+.body-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-top:8px;background:rgba(0,0,0,.4);border:1px solid rgba(200,164,92,.14);border-right:3px solid var(--blue)}
+.body-row small{color:var(--text-dim)}
+@media (max-width:600px){.gym-tab{padding:8px 10px;font-size:14px}}
 </style>
 </head>
 <body>
@@ -373,6 +437,25 @@ body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px
       <div class="quests-date" id="questDate"></div>
     </div>
     <div id="dailyQuestsList"></div>
+  </div>
+
+  <div class="food-box">
+    <div class="food-head">
+      <h3 class="food-title">🍽️ السعرات اليوم</h3>
+      <div class="food-status" id="foodStatus"></div>
+    </div>
+    <div class="food-meter"><div class="food-fill" id="foodFill"></div></div>
+    <div class="food-numbers">
+      <span><b id="foodTotal">0</b> / <span id="foodLimit">0</span> سعرة</span>
+      <span id="foodLeft"></span>
+    </div>
+    <div class="food-add">
+      <input type="text" id="foodName" class="form-control" placeholder="الوجبة (اختياري)">
+      <input type="number" id="foodKcal" class="form-control" placeholder="سعرات" min="1" inputmode="numeric">
+      <button class="btn" data-act="add-food">+ أضف</button>
+    </div>
+    <div class="food-favs" id="foodFavs"></div>
+    <div id="foodList"></div>
   </div>
 
   <div class="stats-header">
@@ -424,6 +507,16 @@ body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px
       <input type="file" id="importFile" accept=".json" hidden>
     </div>
     <p style="color:var(--green);margin-top:15px;font-size:13px">💾 الحفظ التلقائي مفعّل: تُحفظ بياناتك بعد كل تعديل وعند إغلاق الصفحة.</p>
+  </div>
+
+  <h2 class="section-title" style="color:var(--green)">🍽️ حساب السعرات</h2>
+  <div class="form-box">
+    <div class="form-row">
+      <div class="form-group"><label for="foodLimitInput">الحد الأقصى اليومي (سعرة)</label><input type="number" id="foodLimitInput" class="form-control" min="1" inputmode="numeric"></div>
+      <div class="form-group"><label for="foodMinInput">الحد الأدنى اليومي (اختياري)</label><input type="number" id="foodMinInput" class="form-control" min="0" inputmode="numeric"></div>
+    </div>
+    <p class="hint" style="margin-top:0;margin-bottom:12px">تجاوز الحد الأقصى يخصم 100 رونة فوراً. الالتزام به حتى نهاية اليوم يمنحك +100 رونة و+100 صحة. ضع حداً أدنى حتى لا تُكافأ على الأكل القليل جداً (اتركه 0 لتعطيله).</p>
+    <button class="btn btn-wide btn-green" style="margin-top:0" data-act="save-food-settings">حفظ إعدادات السعرات</button>
   </div>
 
   <h2 class="section-title">📲 تثبيت التطبيق على هاتفك</h2>
@@ -483,6 +576,37 @@ body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px
   </div>
 </section>
 
+<!-- الجيم -->
+<section id="page7" class="page">
+  <h2 class="section-title">🏋️ برنامج الجيم</h2>
+  <div class="gym-bar">
+    <div class="gym-week" id="gymWeekLabel"></div>
+    <div class="gym-bar-btns">
+      <button class="btn btn-sm" data-act="gym-week-prev">السابق</button>
+      <button class="btn btn-sm" data-act="gym-week-next" id="gymNextBtn">التالي</button>
+      <button class="btn btn-sm btn-green" data-act="gym-week-new">+ أسبوع جديد</button>
+    </div>
+  </div>
+  <div class="gym-summary" id="gymSummary"></div>
+  <div class="gym-tabs" id="gymTabs"></div>
+  <div id="gymList"></div>
+  <div class="gym-actions" id="gymActions"></div>
+
+  <h2 class="section-title" style="color:var(--blue)">⚖️ قياسات الجسم</h2>
+  <div class="form-box">
+    <div class="body-grid">
+      <div><label class="hint" for="bodyDate">التاريخ</label><input type="date" id="bodyDate" class="form-control"></div>
+      <div><label class="hint" for="bodyWeight">الوزن (كغ)</label><input type="number" id="bodyWeight" class="form-control" step="0.1" min="0" inputmode="decimal"></div>
+      <div><label class="hint" for="bodyWaist">الخصر (سم)</label><input type="number" id="bodyWaist" class="form-control" step="0.1" min="0" inputmode="decimal"></div>
+      <div><label class="hint" for="bodySteps">متوسط الخطوات</label><input type="number" id="bodySteps" class="form-control" min="0" inputmode="numeric"></div>
+    </div>
+    <div class="form-group"><input type="text" id="bodyNote" class="form-control" placeholder="ملاحظات (اختياري)"></div>
+    <button class="btn btn-wide btn-blue" style="margin-top:0" data-act="add-body">+ سجّل القياس</button>
+    <div id="bodyChart" style="margin-top:16px"></div>
+    <div id="bodyList"></div>
+  </div>
+</section>
+
 <!-- المتجر -->
 <section id="page6" class="page">
   <div class="runes-hero">
@@ -520,6 +644,7 @@ body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px
 <nav class="nav-bar">
   <button class="nav-btn active" data-act="page" data-page="1">المقام</button>
   <button class="nav-btn" data-act="page" data-page="2">الأفعال</button>
+  <button class="nav-btn" data-act="page" data-page="7">الجيم</button>
   <button class="nav-btn" data-act="page" data-page="6">المتجر</button>
   <button class="nav-btn" data-act="page" data-page="3">العهد</button>
   <button class="nav-btn" data-act="page" data-page="4">السجل</button>
@@ -534,6 +659,19 @@ body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px
     <h2 id="noticeTitle"></h2>
     <p id="noticeText"></p>
     <button class="btn" data-act="close-notice">حسناً</button>
+  </div>
+</div>
+
+<!-- تمرين الجيم -->
+<div class="modal edit-good" id="gymExModal">
+  <div class="modal-content">
+    <h2 id="gymExTitle">تمرين</h2>
+    <div class="form-group"><label for="gymExName">اسم التمرين</label><input type="text" id="gymExName" class="form-control" placeholder="مثال: Squat"></div>
+    <div class="form-group"><label for="gymExTarget">الهدف (مجموعات × تكرارات)</label><input type="text" id="gymExTarget" class="form-control" placeholder="مثال: 3×8"></div>
+    <div class="form-group"><label for="gymExUnit">وحدة القياس</label><input type="text" id="gymExUnit" class="form-control" placeholder="كغ"></div>
+    <input type="hidden" id="gymExId"><input type="hidden" id="gymExSess">
+    <button class="btn btn-wide" style="background:var(--green);border-color:var(--green);color:#fff" data-act="save-gym-ex">حفظ</button>
+    <button class="btn btn-wide btn-ghost" data-act="close-modal" data-modal="gymExModal">إلغاء</button>
   </div>
 </div>
 
@@ -651,9 +789,34 @@ function tier(v) {
 /* =====================================================
    البيانات الافتراضية والتحميل
    ===================================================== */
+/** برنامج الجيم الافتراضي (من ملفك: 4 جلسات) */
+function defaultGym() {
+  let n = 1000;
+  const ex = (name, target, unit = 'كغ') => ({ id: ++n, name, target, unit });
+  return {
+    week: 1, maxWeek: 1, done: {}, logs: {}, body: [],
+    sessions: [
+      { id: 1, name: 'علوي A', exercises: [
+        ex('Barbell bench press', '3×8'), ex('horizontal pull', '3×10'), ex('Dumbbell shoulder press', '3×10'),
+        ex('Lat pulldown', '3×12'), ex('Cable triceps pushdown', '2×12'), ex('Dumbbell biceps curl', '2×12')] },
+      { id: 2, name: 'سفلي A', exercises: [
+        ex('Squat', '3×6-8'), ex('Romanian deadlift', '3×8-10'), ex('Leg press', '3×10-12'),
+        ex('Hamstring curl', '2×10-12'), ex('Standing calf raise', '3×12-15'), ex('Plank', '3×30-45 sec', 'ثانية')] },
+      { id: 3, name: 'علوي B', exercises: [
+        ex('Incline dumbbell press', '3×8-10'), ex('Pull-up or close-grip pulldown', '3×6-10'), ex('Lateral raise', '3×12-15'),
+        ex('Seated cable row', '3×10-12'), ex('Overhead triceps extension', '2×10-12'), ex('EZ-bar biceps curl', '2×10-12')] },
+      { id: 4, name: 'سفلي B', exercises: [
+        ex('Hip thrust or light deadlift', '3×6-8'), ex('Lunges or Bulgarian split squat', '3×8-10 each leg'), ex('Leg extension', '2×12-15'),
+        ex('Seated leg curl', '2×10-12'), ex('Seated calf raise', '3×12-15'), ex('Hanging or lying leg raise', '3×10-15', 'تكرار')] }
+    ]
+  };
+}
+
 const defaultData = () => ({
   health: MAX_HP, globalLevel: 0, streak: 0, lastStreakDate: null,
   runes: 0, lifetimeRunes: 0, shields: 0, bestStreak: 0, history: {},
+  food: { limit: 2500, min: 0, day: dayKey(), penalty: 0, entries: [], favorites: [] },
+  gym: defaultGym(),
   lastPlayedDate: dayKey(), completedDailyQuests: [], activityLog: [], weeklyChallenge: null,
   dailyQuests: [
     { id: 1, text: '🗣️ تمارين الصوت', attrs: ['social'], points: [50] },
@@ -722,6 +885,24 @@ function normalize(raw) {
   d.runes = Math.max(0, +d.runes || 0);
   d.shields = Math.min(MAX_SHIELDS, Math.max(0, +d.shields || 0));
   d.bestStreak = Math.max(+d.bestStreak || 0, +d.streak || 0);
+  const fd = d.food && typeof d.food === 'object' ? d.food : {};
+  d.food = {
+    limit: +fd.limit > 0 ? +fd.limit : 2500,
+    min: Math.max(0, +fd.min || 0),
+    day: fd.day || dayKey(),
+    penalty: Math.max(0, +fd.penalty || 0),
+    entries: Array.isArray(fd.entries) ? fd.entries : [],
+    favorites: Array.isArray(fd.favorites) ? fd.favorites : []
+  };
+  const g = d.gym && typeof d.gym === 'object' ? d.gym : defaultGym();
+  g.sessions = Array.isArray(g.sessions) && g.sessions.length ? g.sessions : defaultGym().sessions;
+  g.sessions.forEach(s => { s.exercises = Array.isArray(s.exercises) ? s.exercises : []; });
+  g.logs = g.logs && typeof g.logs === 'object' ? g.logs : {};
+  g.done = g.done && typeof g.done === 'object' ? g.done : {};
+  g.body = Array.isArray(g.body) ? g.body : [];
+  g.maxWeek = Math.max(1, parseInt(g.maxWeek, 10) || 1);
+  g.week = Math.min(g.maxWeek, Math.max(1, parseInt(g.week, 10) || 1));
+  d.gym = g;
   // أزل أي صفة قديمة لا تملك الحقول الأساسية
   const base = defaultData().attributes;
   for (const k of Object.keys(base)) d.attributes[k] = Object.assign({}, base[k], d.attributes[k] || {});
@@ -975,6 +1156,7 @@ function checkNewDay() {
       notify('انكسرت سلسلتك ونقصت صحتك بـ 50 بسبب عدم إنجاز المهام.', 1200, 'CHAIN BROKEN');
     }
   }
+  intro += settleFood();
   data.lastPlayedDate = today;
   data.completedDailyQuests = [];
   notify(`${intro}🔥 السلسلة: ${data.streak} يوم\n☀ مهام اليوم: ${data.dailyQuests.length}\n🛡️ دروع الراحة: ${data.shields}\n💠 الرونات: ${data.runes}`, 800, 'A NEW DAY');
@@ -1292,6 +1474,9 @@ function renderAll() {
   renderHome();
   renderHeatmap();
   renderShop();
+  renderFood();
+  renderGym();
+  renderBody();
   renderActions();
   renderSettings();
   renderLog();
@@ -1557,6 +1742,36 @@ const actions = {
   'buy-reward': el => buyReward(el.dataset.id),
   'buy-shield': buyShield,
   'install': installApp,
+  'add-food': addFood,
+  'del-food': el => deleteFood(el.dataset.id),
+  'fav-food': el => saveFavorite(el.dataset.id),
+  'add-fav': el => {
+    const f = data.food.favorites.find(x => sameId(x.id, el.dataset.id));
+    if (f) addFoodEntry(f.name, f.kcal);
+  },
+  'del-fav': el => {
+    snapshot('حذف وجبة محفوظة');
+    data.food.favorites = data.food.favorites.filter(x => !sameId(x.id, el.dataset.id));
+    save();
+  },
+  'save-food-settings': saveFoodSettings,
+  'gym-tab': el => { gymTab = el.dataset.id; renderGym(); },
+  'gym-week-prev': () => gymGoWeek(data.gym.week - 1),
+  'gym-week-next': () => gymGoWeek(data.gym.week + 1),
+  'gym-week-new': gymNewWeek,
+  'gym-fill-prev': gymFillPrev,
+  'gym-done': gymFinishSession,
+  'gym-edit-toggle': () => { gymEdit = !gymEdit; renderGym(); },
+  'gym-add-ex': () => openGymEx(null),
+  'gym-edit-ex': el => openGymEx(el.dataset.id),
+  'gym-del-ex': el => deleteGymEx(el.dataset.id),
+  'save-gym-ex': saveGymEx,
+  'add-body': addBody,
+  'del-body': el => {
+    snapshot('حذف قياس');
+    data.gym.body = data.gym.body.filter(b => !sameId(b.id, el.dataset.id));
+    save();
+  },
   'edit-reward-cost': el => {
     const r = data.rewards.find(x => sameId(x.id, el.dataset.id));
     if (!r) return;
@@ -1689,6 +1904,407 @@ function startEmbers() {
     requestAnimationFrame(frame);
   })(0);
 }
+
+/* =====================================================
+   حساب السعرات
+   ===================================================== */
+const FOOD_REWARD_RUNES = 100, FOOD_REWARD_HP = 100, FOOD_PENALTY_RUNES = 100;
+const foodTotal = () => data.food.entries.reduce((s, e) => s + e.kcal, 0);
+
+/** يطبّق أو يسترد خصم تجاوز الحد بحسب مجموع اليوم الحالي */
+function reevalFood() {
+  const f = data.food, total = foodTotal();
+  if (total > f.limit && !f.penalty) {
+    const taken = Math.min(data.runes, FOOD_PENALTY_RUNES);
+    data.runes -= taken;
+    f.penalty = taken;
+    addToLog('🍽️ تجاوز حد السعرات', `-${taken} رونة`, 'bad', `إجمالي اليوم ${total} من ${f.limit}`);
+    sfx('death');
+    banner('LIMIT EXCEEDED', `-${taken} رونة`);
+  } else if (total <= f.limit && f.penalty) {
+    data.runes += f.penalty;
+    addToLog('↩️ استرداد رونات', `+${f.penalty} رونة`, 'normal', 'عدت إلى ما دون الحد بعد تعديل الإدخال');
+    f.penalty = 0;
+  }
+}
+
+function addFoodEntry(name, kcal) {
+  snapshot(`إضافة طعام: ${name}`);
+  data.food.entries.push({ id: newId(), name, kcal, time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) });
+  reevalFood();
+  save();
+}
+
+function addFood() {
+  const kcal = parseInt($('foodKcal').value, 10);
+  const name = $('foodName').value.trim() || 'وجبة';
+  if (!(kcal > 0) || kcal > 10000) return notice('أدخل عدد سعرات صحيحاً.');
+  addFoodEntry(name, kcal);
+  $('foodName').value = '';
+  $('foodKcal').value = '';
+  $('foodName').focus();
+}
+
+function deleteFood(id) {
+  snapshot('حذف طعام');
+  data.food.entries = data.food.entries.filter(e => !sameId(e.id, id));
+  reevalFood();
+  save();
+}
+
+function saveFavorite(id) {
+  const e = data.food.entries.find(x => sameId(x.id, id));
+  if (!e) return;
+  if (data.food.favorites.some(f => f.name === e.name && f.kcal === e.kcal)) return toast('محفوظة مسبقاً');
+  snapshot('حفظ وجبة سريعة');
+  data.food.favorites.push({ id: newId(), name: e.name, kcal: e.kcal });
+  save();
+  toast('⭐ حُفظت في الوجبات السريعة');
+}
+
+function saveFoodSettings() {
+  const limit = parseInt($('foodLimitInput').value, 10);
+  const min = parseInt($('foodMinInput').value, 10) || 0;
+  if (!(limit > 0)) return notice('أدخل حداً أقصى صحيحاً.');
+  if (min < 0 || min >= limit) return notice('الحد الأدنى يجب أن يكون أقل من الحد الأقصى.');
+  snapshot('تعديل إعدادات السعرات');
+  data.food.limit = limit;
+  data.food.min = min;
+  reevalFood();
+  save();
+  toast('✅ حُفظت إعدادات السعرات');
+}
+
+/** يُنفَّذ عند بدء يوم جديد: يكافئ الالتزام بحد أمس. يعيد نصاً يُضاف لإشعار اليوم الجديد */
+function settleFood() {
+  const f = data.food, today = dayKey();
+  if (f.day === today) return '';
+  let text = '';
+  if (f.entries.length) {
+    const total = foodTotal();
+    const key = localDateKey(new Date(f.day));
+    const h = data.history[key] || (data.history[key] = { acts: 0, full: false, runes: 0 });
+    h.kcal = total;
+    if (!f.penalty && total <= f.limit && total >= f.min) {
+      earnRunes(FOOD_REWARD_RUNES);
+      data.health = Math.min(MAX_HP, data.health + FOOD_REWARD_HP);
+      addToLog('🍽️ التزمت بحد السعرات', `+${FOOD_REWARD_RUNES} رونة | +${FOOD_REWARD_HP} صحة`, 'achievement', `إجمالي أمس ${total} من ${f.limit}`);
+      text = `🍽️ التزمت بحد السعرات أمس (${total}): +${FOOD_REWARD_RUNES} رونة و+${FOOD_REWARD_HP} صحة.\n\n`;
+    } else if (!f.penalty && total < f.min) {
+      addToLog('🍽️ دون الحد الأدنى', 'بلا مكافأة', 'normal', `إجمالي أمس ${total} وحدك الأدنى ${f.min}`);
+      text = `🍽️ سجّلت أمس ${total} سعرة، أقل من حدك الأدنى (${f.min}). لا مكافأة؛ الأكل الكافي جزء من هدفك.\n\n`;
+    }
+  }
+  f.entries = [];
+  f.penalty = 0;
+  f.day = today;
+  return text;
+}
+
+function renderFood() {
+  const f = data.food, total = foodTotal();
+  $('foodTotal').textContent = total;
+  $('foodLimit').textContent = f.limit;
+  const pct = Math.min(100, (total / f.limit) * 100);
+  $('foodFill').style.width = `${pct}%`;
+  $('foodFill').className = 'food-fill' + (total > f.limit ? ' over' : pct >= 85 ? ' warn' : '');
+  $('foodLeft').textContent = total > f.limit ? `تجاوزت بـ ${total - f.limit} سعرة` : `المتبقي: ${f.limit - total} سعرة`;
+  let state = '', status = 'سجّل وجباتك لتبدأ اليوم';
+  if (total > f.limit) { state = 'over'; status = '⚠️ تجاوزت الحد'; }
+  else if (total > 0 && total < f.min) status = `ما زلت دون حدك الأدنى (${f.min})`;
+  else if (total > 0) { state = 'ok'; status = '✅ ضمن الحد'; }
+  $('foodStatus').textContent = status;
+  $('foodStatus').dataset.state = state;
+
+  $('foodFavs').innerHTML = f.favorites.map(x => `
+    <span class="chip" data-act="add-fav" data-id="${x.id}" title="أضف بضغطة"><span>${esc(x.name)} · ${x.kcal}</span><button class="x" data-act="del-fav" data-id="${x.id}" aria-label="حذف">×</button></span>`).join('');
+  $('foodList').innerHTML = [...f.entries].reverse().map(e => `
+    <div class="food-row">
+      <div><span>${esc(e.name)}</span><small>${esc(e.time || '')}</small></div>
+      <div class="row-btns"><span class="kc">${e.kcal}</span>
+        <button class="btn-star" data-act="fav-food" data-id="${e.id}" title="احفظ كوجبة سريعة" aria-label="احفظ">⭐</button>
+        <button class="btn-del" data-act="del-food" data-id="${e.id}" aria-label="حذف">×</button></div>
+    </div>`).join('');
+
+  // قيم الإعدادات (دون الكتابة فوق ما يكتبه المستخدم الآن)
+  if (document.activeElement !== $('foodLimitInput')) $('foodLimitInput').value = f.limit;
+  if (document.activeElement !== $('foodMinInput')) $('foodMinInput').value = f.min || '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (e.target.id === 'foodKcal') { e.preventDefault(); addFood(); }
+  else if (e.target.id === 'foodName') { e.preventDefault(); $('foodKcal').focus(); }
+});
+// إذا بقي التطبيق مفتوحاً أو في الخلفية بعد منتصف الليل
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && data.lastPlayedDate !== dayKey()) { checkNewDay(); initWeeklyChallenge(); save(); }
+});
+
+/* =====================================================
+   الجيم: متابعة الأوزان أسبوعياً
+   ===================================================== */
+const GYM_PR_RUNES = 50, GYM_SESSION_RUNES = 150;
+let gymTab = null, gymEdit = false;
+
+const gymSession = () => data.gym.sessions.find(s => sameId(s.id, gymTab)) || data.gym.sessions[0];
+const gymFindEx = id => { for (const s of data.gym.sessions) { const e = s.exercises.find(x => sameId(x.id, id)); if (e) return e; } return null; };
+const gymEntry = (exId, week) => (data.gym.logs[exId] || {})[week];
+const doneKey = (week, sid) => `${week}|${sid}`;
+
+/** كل القيم المسجلة لتمرين، مرتبة بالأسبوع */
+function gymSeries(exId) {
+  const l = data.gym.logs[exId] || {};
+  return Object.keys(l).map(Number).sort((a, b) => a - b).filter(w => l[w] && l[w].w != null).map(w => ({ week: w, w: l[w].w }));
+}
+/** أعلى وزن مسجل في غير الأسبوع المذكور (null إن لم يوجد) */
+function gymBest(exId, exceptWeek) {
+  const v = gymSeries(exId).filter(p => p.week !== exceptWeek).map(p => p.w);
+  return v.length ? Math.max(...v) : null;
+}
+const fmtNum = n => (Math.round(n * 100) / 100).toString();
+
+function sparkline(vals, w = 84, h = 26) {
+  if (vals.length < 2) return '';
+  const min = Math.min(...vals), max = Math.max(...vals), rng = max - min || 1;
+  const pts = vals.map((v, i) => [(i / (vals.length - 1)) * (w - 6) + 3, h - 4 - ((v - min) / rng) * (h - 8)]);
+  const last = pts[pts.length - 1];
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    <polyline fill="none" stroke="#c8a45c" stroke-width="1.6" stroke-linejoin="round" points="${pts.map(p => p.map(n => n.toFixed(1)).join(',')).join(' ')}"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.6" fill="#f1d899"/></svg>`;
+}
+
+function gymMetaHtml(ex) {
+  const wk = data.gym.week;
+  const series = gymSeries(ex.id);
+  const prev = [...series].reverse().find(p => p.week < wk);
+  const cur = gymEntry(ex.id, wk);
+  let html = '<div>';
+  if (prev) {
+    html += `الأسبوع ${prev.week}: <b>${fmtNum(prev.w)}</b>`;
+    if (cur && cur.w != null) {
+      const d = cur.w - prev.w;
+      html += d === 0 ? '<span class="gym-chg">=</span>'
+        : `<span class="gym-chg ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲ +' : '▼ '}${fmtNum(d)}</span>`;
+    }
+  } else html += 'لا سجل سابق';
+  if (cur && cur.pr) html += ' <span class="gym-pr">★ NEW RECORD</span>';
+  html += '</div>';
+  return html + sparkline(series.map(p => p.w));
+}
+
+function gymExHtml(ex) {
+  const e = gymEntry(ex.id, data.gym.week) || {};
+  const edit = gymEdit ? `<div class="action-controls">
+      <button class="btn btn-sm btn-green" data-act="gym-edit-ex" data-id="${ex.id}">✏️</button>
+      <button class="btn-del" data-act="gym-del-ex" data-id="${ex.id}" aria-label="حذف">×</button></div>` : '';
+  return `<div class="gym-ex" data-ex="${ex.id}">
+    <div class="gym-ex-head"><div><div class="gym-ex-name">${esc(ex.name)}</div><div class="gym-ex-target">الهدف: ${esc(ex.target || '—')}</div></div>${edit}</div>
+    <div class="gym-inputs">
+      <div class="gym-wbox"><input type="number" class="form-control gym-w" data-ex="${ex.id}" step="0.5" min="0" inputmode="decimal" placeholder="0" value="${e.w != null ? e.w : ''}" aria-label="الوزن"><span class="gym-unit">${esc(ex.unit || 'كغ')}</span></div>
+      <input type="text" class="form-control gym-r" data-ex="${ex.id}" placeholder="التكرارات / ملاحظة" value="${esc(e.r || '')}" aria-label="ملاحظة">
+    </div>
+    <div class="gym-meta">${gymMetaHtml(ex)}</div>
+  </div>`;
+}
+
+function gymSummaryHtml() {
+  const wk = data.gym.week;
+  const all = data.gym.sessions.flatMap(s => s.exercises);
+  const logged = all.filter(e => { const x = gymEntry(e.id, wk); return x && x.w != null; }).length;
+  const prs = all.filter(e => { const x = gymEntry(e.id, wk); return x && x.pr; }).length;
+  const done = data.gym.sessions.filter(s => data.gym.done[doneKey(wk, s.id)]).length;
+  return `<span>جلسات منجزة: <b>${done}/${data.gym.sessions.length}</b></span><span>تمارين مسجلة: <b>${logged}/${all.length}</b></span><span>أرقام قياسية: <b>${prs}</b></span>`;
+}
+
+function renderGym() {
+  const g = data.gym, wk = g.week;
+  if (!g.sessions.some(s => sameId(s.id, gymTab))) gymTab = g.sessions[0].id;
+  $('gymWeekLabel').innerHTML = `الأسبوع ${wk}<small>من ${g.maxWeek}</small>`;
+  $('gymNextBtn').disabled = wk >= g.maxWeek;
+  $('gymSummary').innerHTML = gymSummaryHtml();
+  $('gymTabs').innerHTML = g.sessions.map(s =>
+    `<button class="gym-tab ${sameId(s.id, gymTab) ? 'active' : ''} ${g.done[doneKey(wk, s.id)] ? 'done' : ''}" data-act="gym-tab" data-id="${s.id}">${esc(s.name)}</button>`).join('');
+  const s = gymSession();
+  const isDone = !!g.done[doneKey(wk, s.id)];
+  $('gymList').innerHTML = (s.exercises.length ? s.exercises.map(gymExHtml).join('') : '<div class="empty">لا توجد تمارين في هذه الجلسة.</div>') +
+    (gymEdit ? '<button class="btn btn-wide btn-green" data-act="gym-add-ex">+ إضافة تمرين</button>' : '');
+  $('gymActions').innerHTML =
+    `<button class="btn" data-act="gym-fill-prev">📋 املأ بأوزان الأسبوع السابق</button>
+     <button class="btn btn-green" data-act="gym-done" ${isDone ? 'disabled' : ''}>${isDone ? '✅ أُنجزت هذه الجلسة' : '✔ أنجزت جلسة اليوم (+' + GYM_SESSION_RUNES + ' رونة)'}</button>
+     <button class="btn btn-ghost ${gymEdit ? 'active' : ''}" data-act="gym-edit-toggle">${gymEdit ? 'إنهاء تعديل البرنامج' : '⚙️ تعديل البرنامج'}</button>`;
+}
+
+function gymGoWeek(n) {
+  if (n < 1 || n > data.gym.maxWeek) return;
+  data.gym.week = n;
+  persist();
+  renderGym();
+}
+function gymNewWeek() {
+  const g = data.gym;
+  const cur = g.week;
+  if (!confirm(`بدء الأسبوع ${g.maxWeek + 1}؟`)) return;
+  snapshot('أسبوع جيم جديد');
+  g.maxWeek++;
+  g.week = g.maxWeek;
+  save();
+}
+function gymFillPrev() {
+  const wk = data.gym.week, s = gymSession();
+  let n = 0;
+  const changes = [];
+  s.exercises.forEach(ex => {
+    const cur = gymEntry(ex.id, wk);
+    if (cur && cur.w != null) return;
+    const prev = [...gymSeries(ex.id)].reverse().find(p => p.week < wk);
+    if (prev) changes.push([ex.id, prev.w]);
+  });
+  if (!changes.length) return toast('لا توجد أوزان سابقة لنسخها');
+  snapshot('نسخ أوزان الأسبوع السابق');
+  changes.forEach(([id, w]) => {
+    const l = data.gym.logs[id] || (data.gym.logs[id] = {});
+    const e = l[wk] || (l[wk] = { w: null, r: '', pr: false });
+    e.w = w; n++;
+  });
+  save();
+  toast(`📋 نُسخ ${n} وزناً`);
+}
+
+function gymRefreshRow(exId) {
+  const ex = gymFindEx(exId);
+  const row = document.querySelector(`.gym-ex[data-ex="${exId}"] .gym-meta`);
+  if (ex && row) row.innerHTML = gymMetaHtml(ex);
+  $('gymSummary').innerHTML = gymSummaryHtml();
+}
+
+/** يحفظ وزناً أو ملاحظة لتمرين في الأسبوع المعروض (دون إعادة رسم الصفحة حتى لا يضيع التركيز) */
+function saveGymField(exId, field, raw) {
+  const ex = gymFindEx(exId);
+  if (!ex) return;
+  const wk = data.gym.week;
+  let val;
+  if (field === 'w') {
+    raw = String(raw).trim().replace(',', '.');
+    val = raw === '' ? null : parseFloat(raw);
+    if (val !== null && (!isFinite(val) || val < 0 || val > 2000)) return toast('⚠️ أدخل رقماً صحيحاً');
+  } else val = String(raw).trim().slice(0, 80);
+
+  snapshot(`${field === 'w' ? 'تسجيل وزن' : 'ملاحظة'}: ${ex.name}`);
+  const l = data.gym.logs[exId] || (data.gym.logs[exId] = {});
+  const e = l[wk] || (l[wk] = { w: null, r: '', pr: false });
+  let record = false;
+  if (field === 'w') {
+    e.w = val;
+    const best = gymBest(exId, wk);
+    // رقم قياسي: يتجاوز أفضل وزن سابق، ويُمنح مرة واحدة لكل تمرين في كل أسبوع
+    if (val !== null && best !== null && val > best && !e.pr) {
+      e.pr = true;
+      record = true;
+      earnRunes(GYM_PR_RUNES);
+      addToLog(`🏋️ رقم قياسي: ${ex.name}`, `${fmtNum(val)} ${ex.unit || 'كغ'} (كان ${fmtNum(best)}) | +${GYM_PR_RUNES} رونة`, 'achievement');
+    }
+  } else e.r = val;
+  if (e.w == null && !e.r && !e.pr) delete l[wk];
+
+  persist();
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(autoSaveBackup, 1500);
+  gymRefreshRow(exId);
+  if (record) {
+    renderHome(); renderShop();
+    sfx('reward');
+    banner('NEW RECORD', `${ex.name} — ${fmtNum(val)} ${ex.unit || 'كغ'}`);
+    fireConfetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#c8a45c', '#f1d899', '#ffffff'] });
+  }
+}
+
+function gymFinishSession() {
+  const wk = data.gym.week, s = gymSession(), key = doneKey(wk, s.id);
+  if (data.gym.done[key]) return;
+  snapshot(`إنهاء جلسة: ${s.name}`);
+  data.gym.done[key] = true;
+  earnRunes(GYM_SESSION_RUNES);
+  noteActivity();
+  addToLog(`🏋️ جلسة جيم: ${s.name}`, `الأسبوع ${wk} | +${GYM_SESSION_RUNES} رونة`, 'quest');
+  autoProgressWeekly('تمرين الجيم');
+  sfx('reward');
+  banner('SESSION COMPLETE', `${s.name} — الأسبوع ${wk}`);
+  fireConfetti({ particleCount: 100, spread: 75, origin: { y: 0.6 }, colors: ['#c8a45c', '#f1d899'] });
+  save();
+}
+
+/* ---------- تعديل البرنامج ---------- */
+function openGymEx(id) {
+  const s = gymSession();
+  const ex = id ? gymFindEx(id) : null;
+  $('gymExId').value = ex ? ex.id : '';
+  $('gymExSess').value = s.id;
+  $('gymExTitle').textContent = ex ? 'تعديل التمرين' : `تمرين جديد (${s.name})`;
+  $('gymExName').value = ex ? ex.name : '';
+  $('gymExTarget').value = ex ? ex.target : '3×10';
+  $('gymExUnit').value = ex ? (ex.unit || 'كغ') : 'كغ';
+  openModal('gymExModal');
+  $('gymExName').focus();
+}
+function saveGymEx() {
+  const name = $('gymExName').value.trim();
+  if (!name) return notice('يرجى كتابة اسم التمرين');
+  const target = $('gymExTarget').value.trim(), unit = $('gymExUnit').value.trim() || 'كغ';
+  const id = $('gymExId').value;
+  snapshot(id ? 'تعديل تمرين' : 'إضافة تمرين');
+  if (id) {
+    Object.assign(gymFindEx(id), { name, target, unit });
+  } else {
+    const s = data.gym.sessions.find(x => sameId(x.id, $('gymExSess').value));
+    if (s) s.exercises.push({ id: newId(), name, target, unit });
+  }
+  closeModal('gymExModal');
+  save();
+}
+function deleteGymEx(id) {
+  const ex = gymFindEx(id);
+  if (!ex || !confirm(`حذف «${ex.name}» مع كل أوزانه المسجلة؟`)) return;
+  snapshot(`حذف تمرين: ${ex.name}`);
+  data.gym.sessions.forEach(s => { s.exercises = s.exercises.filter(x => !sameId(x.id, id)); });
+  delete data.gym.logs[id];
+  save();
+}
+
+/* ---------- قياسات الجسم ---------- */
+function addBody() {
+  const date = $('bodyDate').value;
+  const num = id => { const v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : null; };
+  const weight = num('bodyWeight'), waist = num('bodyWaist'), steps = num('bodySteps');
+  const note = $('bodyNote').value.trim().slice(0, 120);
+  if (!date) return notice('اختر التاريخ');
+  if (weight === null && waist === null && steps === null) return notice('أدخل الوزن أو الخصر أو الخطوات على الأقل.');
+  snapshot('تسجيل قياس جسم');
+  data.gym.body.push({ id: newId(), date, weight, waist, steps, note });
+  data.gym.body.sort((a, b) => a.date.localeCompare(b.date));
+  ['bodyWeight', 'bodyWaist', 'bodySteps', 'bodyNote'].forEach(i => { $(i).value = ''; });
+  save();
+  toast('✅ سُجّل القياس');
+}
+
+function renderBody() {
+  const list = data.gym.body;
+  if (!$('bodyDate').value) $('bodyDate').value = localDateKey(new Date());
+  const weights = list.filter(b => b.weight != null).map(b => b.weight);
+  $('bodyChart').innerHTML = weights.length >= 2
+    ? `<div class="gym-meta"><div>الوزن: <b>${fmtNum(weights[0])}</b> ← <b>${fmtNum(weights[weights.length - 1])}</b> كغ <span class="gym-chg ${weights[weights.length - 1] - weights[0] >= 0 ? 'up' : 'down'}">${weights[weights.length - 1] - weights[0] >= 0 ? '+' : ''}${fmtNum(weights[weights.length - 1] - weights[0])}</span></div>${sparkline(weights, 160, 40)}</div>` : '';
+  $('bodyList').innerHTML = [...list].reverse().slice(0, 12).map(b => `
+    <div class="body-row">
+      <div><b>${esc(b.date)}</b> <small>${[b.weight != null ? `${fmtNum(b.weight)} كغ` : '', b.waist != null ? `خصر ${fmtNum(b.waist)} سم` : '', b.steps != null ? `${b.steps} خطوة` : '', esc(b.note || '')].filter(Boolean).join(' · ')}</small></div>
+      <button class="btn-del" data-act="del-body" data-id="${b.id}" aria-label="حذف">×</button>
+    </div>`).join('');
+}
+
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.classList && t.classList.contains('gym-w')) saveGymField(t.dataset.ex, 'w', t.value);
+  else if (t.classList && t.classList.contains('gym-r')) saveGymField(t.dataset.ex, 'r', t.value);
+});
 
 /* =====================================================
    الرونات: المتجر، الدرع، وخريطة الالتزام
