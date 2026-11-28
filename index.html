@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#07060a">
+<meta name="color-scheme" content="dark">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -399,6 +400,106 @@ body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px
 .body-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-top:8px;background:rgba(0,0,0,.4);border:1px solid rgba(200,164,92,.14);border-right:3px solid var(--blue)}
 .body-row small{color:var(--text-dim)}
 @media (max-width:600px){.gym-tab{padding:8px 10px;font-size:14px}}
+
+/* ---------- v6: تحسين شكل الهاتف ---------- */
+@media (max-width:600px){
+  body{font-size:16px;padding-top:calc(64px + env(safe-area-inset-top))}
+  .top-bar{padding:8px;gap:6px}
+  .top-btn{padding:7px 12px;font-size:13px;box-shadow:0 0 10px rgba(0,0,0,.8)}
+
+  /* شريط التنقل: أيقونة فوق الاسم، سبعة أزرار بعرض متساوٍ */
+  .nav-bar{justify-content:stretch;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
+  .nav-btn{flex:1 1 0;min-width:0;padding:4px 0;font-size:11px;font-family:'Amiri','Cinzel',serif;line-height:1.3;border-top:2px solid transparent}
+  .nav-btn::before{content:attr(data-icon);display:block;width:auto;height:auto;margin:0 auto 1px;background:none!important;transform:none;box-shadow:none!important;font-size:20px;line-height:1.2;filter:grayscale(.85) brightness(.75)}
+  .nav-btn.active{border-top-color:var(--gold-glow);background:linear-gradient(to bottom,rgba(200,164,92,.16),transparent)}
+  .nav-btn.active::before{filter:none}
+  body{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+
+  .page{padding:14px 12px}
+  .hero{margin-bottom:18px}
+  .erdtree{width:min(260px,70%);margin-bottom:-12px}
+  .hero-sub{font-size:11px;letter-spacing:.4em}
+
+  /* ترتيب الصفحة الرئيسية على الهاتف: الصحة أولاً */
+  #page1.active{display:flex;flex-direction:column}
+  #page1 .hero{order:0}
+  #page1 .stats-header{order:1}
+  #page1 .quests-box{order:2}
+  #page1 .weekly-box{order:3}
+  #page1 .food-box{order:4}
+  #page1 .grid{order:5}
+  #page1 .heat-box{order:6}
+
+  .weekly-box,.quests-box,.stats-header,.food-box,.form-box,.heat-box,.gym-bar{padding:16px 14px;margin-bottom:18px}
+  .weekly-desc{font-size:20px;margin-bottom:12px}
+  .quests-title{font-size:20px}
+  .quest-item{padding:12px;gap:8px}
+  .quest-main{gap:12px}
+  .quest-text{font-size:16px}
+  .quest-reward{font-size:12px}
+  .quest-item .btn{padding:8px 14px;font-size:14px}
+  .stats-header{gap:14px}
+  .side-stats{gap:8px}
+  .stat-box{padding:8px 4px}
+  .box-value{font-size:26px}
+  .box-title{font-size:10px;letter-spacing:.2em}
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .attr-card{padding:22px 10px 14px}
+  .attr-icon{width:46px;height:46px;margin:6px auto 18px}
+  .attr-icon span{font-size:22px}
+  .attr-name{font-size:17px}
+  .attr-level b{font-size:28px}
+  .section-title{font-size:20px;margin:28px 0 16px}
+
+  /* السعرات */
+  .food-title{font-size:19px}
+  .food-add{display:grid;grid-template-columns:1fr 96px;gap:8px}
+  .food-add .btn{grid-column:1 / -1}
+  .food-add input[type=text],.food-add input[type=number]{width:100%;min-width:0}
+
+  /* الأفعال والنماذج */
+  .action-header{padding:12px}
+  .action-name{font-size:16px}
+  .action-controls{width:100%;justify-content:flex-start}
+  .filter-controls{padding:12px;margin-bottom:20px}
+  .attr-input-row{gap:8px}
+  .form-control{padding:10px 12px}
+  .log-item{padding:12px}
+  .heatmap{grid-auto-columns:13px;grid-template-rows:repeat(7,13px);gap:3px}
+  .hm{width:13px;height:13px}
+  .chart-container{height:420px;padding:10px}
+
+  /* الجيم: صف واحد لكل تمرين */
+  .gym-week{font-size:19px}
+  .gym-bar-btns{width:100%}
+  .gym-bar-btns .btn{flex:1;padding:8px 6px;font-size:13px}
+  .gym-summary{gap:10px 14px;font-size:12px;margin-bottom:12px}
+  .gym-tabs{gap:6px;margin-bottom:12px}
+  .gym-tab{flex:1 1 0;padding:9px 4px;font-size:14px;min-width:0}
+  .gym-ex{padding:12px;margin-bottom:10px}
+  .gym-ex-head{margin-bottom:8px}
+  .gym-ex-name{font-size:15px}
+  .gym-ex-target{font-size:12px}
+  .gym-inputs{flex-wrap:nowrap;gap:8px}
+  .gym-wbox{flex:0 0 112px}
+  .gym-wbox .form-control{font-size:18px;padding:8px 36px 8px 8px}
+  .gym-unit{left:7px;font-size:11px}
+  .gym-inputs .gym-r{flex:1 1 0;min-width:0;padding:10px 8px;font-size:14px}
+  .gym-meta{margin-top:6px;font-size:12px;min-height:24px}
+  .gym-actions .btn{flex:1 1 100%;font-size:15px;padding:12px 8px;white-space:normal}
+
+  /* النوافذ */
+  .modal-content{padding:22px 16px}
+  .modal-content h2{font-size:24px}
+  .modal-content p{font-size:17px}
+  .btn-yes,.btn-no{padding:12px 20px;font-size:17px;margin:4px}
+  .banner{top:26%}
+}
+@media (max-width:360px){
+  .nav-btn{font-size:10px}
+  .nav-btn::before{font-size:18px}
+  .gym-wbox{flex-basis:100px}
+}
 </style>
 </head>
 <body>
@@ -642,13 +743,13 @@ body{padding-top:calc(78px + env(safe-area-inset-top));padding-bottom:calc(112px
 </main>
 
 <nav class="nav-bar">
-  <button class="nav-btn active" data-act="page" data-page="1">المقام</button>
-  <button class="nav-btn" data-act="page" data-page="2">الأفعال</button>
-  <button class="nav-btn" data-act="page" data-page="7">الجيم</button>
-  <button class="nav-btn" data-act="page" data-page="6">المتجر</button>
-  <button class="nav-btn" data-act="page" data-page="3">العهد</button>
-  <button class="nav-btn" data-act="page" data-page="4">السجل</button>
-  <button class="nav-btn" data-act="page" data-page="5">التوازن</button>
+  <button class="nav-btn active" data-act="page" data-page="1" data-icon="🏰">المقام</button>
+  <button class="nav-btn" data-act="page" data-page="2" data-icon="⚔️">الأفعال</button>
+  <button class="nav-btn" data-act="page" data-page="7" data-icon="🏋️">الجيم</button>
+  <button class="nav-btn" data-act="page" data-page="6" data-icon="🛍️">المتجر</button>
+  <button class="nav-btn" data-act="page" data-page="3" data-icon="📜">العهد</button>
+  <button class="nav-btn" data-act="page" data-page="4" data-icon="📖">السجل</button>
+  <button class="nav-btn" data-act="page" data-page="5" data-icon="📊">التوازن</button>
 </nav>
 
 <div class="banner" id="banner" aria-live="polite"><div class="banner-title" id="bannerTitle"></div><div class="banner-sub" id="bannerSub"></div></div>
